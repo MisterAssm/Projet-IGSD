@@ -22,12 +22,13 @@ void draw() {
   directionalLight(204, 204, 204, -dirX, -dirY, -1);
   
   translate(width / 2, height / 2);
-  rotateY(frameCount * 0.02);
-  //rotateY(0.02);
+  //rotateY(frameCount * 0.02);
+  rotateY(0.02);
   
   shape(momie);
 }
 
+// Quadstrip ressemblant plus à des bandages si possible (quadstrip en forme de rectangle)
 PShape creerCorpsMomie() {
   PShape corps = createShape();
   corps.beginShape(QUAD_STRIP);
@@ -46,6 +47,7 @@ PShape creerCorpsMomie() {
       float a = angle + j * PI / 10;
       float x = radius * cos(a);
       float z = radius * sin(a);
+      
       corps.fill(200 + noise(i * 0.1) * 55, 180 + noise(i * 0.1) * 30, 150);
       corps.vertex(x, y, z);
     }
@@ -55,14 +57,19 @@ PShape creerCorpsMomie() {
   return corps;
 }
 
+// Peut-être ne pas mettre les yeux dans le PShape et les draw à l'exécution ?
 PShape creerYeuxMomie() {
   PShape yeux = createShape(GROUP);
+  
   for (int i = -1; i <= 1; i += 2) {
     PShape oeil = createShape(SPHERE, 10);
+    oeil.setStroke(0);
     oeil.translate(i * 20, -100, 40);
-    oeil.setFill(color(255));
+    oeil.setFill(color(0, 128, 0, 192));
+    
     yeux.addChild(oeil);
   }
+  
   return yeux;
 }
 
@@ -91,7 +98,7 @@ PShape creerBrasMomie() {
 
     brasSpiral.endShape();
     brasSpiral.translate(i * 70, -50, 40);
-    brasSpiral.rotateY(TWO_PI * i); // Rotation autour de l'axe Y
+    brasSpiral.rotateY(TWO_PI * i);
     bras.addChild(brasSpiral);
   }
   return bras;
