@@ -1,3 +1,4 @@
+float da = PI / 50.; // angle pour la rotation
 PShape momie;
 
 void setup() {
@@ -6,12 +7,14 @@ void setup() {
   
   momie = createShape(GROUP);
   PShape corps = creerCorpsMomie();
+  PShape tete = creerTeteMomie();
   PShape yeux = creerYeuxMomie();
-  PShape bras = creerBrasMomie();
+  //PShape bras = creerBrasMomie();
   
   momie.addChild(corps);
+  momie.addChild(tete);
   momie.addChild(yeux);
-  momie.addChild(bras);
+  //momie.addChild(bras);
 }
 
 void draw() {
@@ -19,60 +22,106 @@ void draw() {
   
   float dirY = (mouseY / float(height) - 0.5) * 2;
   float dirX = (mouseX / float(width) - 0.5) * 2;
-  directionalLight(204, 204, 204, -dirX, -dirY, -1);
+  //directionalLight(204, 204, 204, -dirX, -dirY, -1);
   
   translate(width / 2, height / 2);
-  //rotateY(frameCount * 0.02);
-  rotateY(0.02);
+  rotateY(frameCount * 0.02);
+  //rotateY(0.02);
   
   shape(momie);
 }
 
 // Quadstrip ressemblant plus à des bandages si possible (quadstrip en forme de rectangle)
 PShape creerCorpsMomie() {
-  PShape corps = createShape();
-  corps.beginShape(QUAD_STRIP);
-  
-  int tours = 100;
-  float hauteur = 300;
-  float baseRadius = 50;
-  float bandeLargeur = 10;
-  
-  for (int i = 0; i < tours; i++) {
-    float angle = map(i, 0, tours, 0, TWO_PI * 10);
-    float y = map(i, 0, tours, -hauteur / 2, hauteur / 2);
-    float radius = baseRadius + noise(i * 0.1) * 20;
+    float baseRadius = 60;
+    float noiseScale = 5.; // variation de couleur
+    float heightOffset = PI / 6.;
+    int stepSize = 25; 
     
-    for (int j = 0; j < 2; j++) {
-      float a = angle + j * PI / 10;
-      float x = radius * cos(a);
-      float z = radius * sin(a);
-      
-      corps.fill(200 + noise(i * 0.1) * 55, 180 + noise(i * 0.1) * 30, 150);
-      corps.vertex(x, y, z);
+    PShape corps = createShape();
+    corps.beginShape(QUAD_STRIP);
+    corps.noStroke();
+    corps.rotateX(PI / 2); // rotation pour aligner correctement la forme
+    
+    for (int i = -200; i <= 200; i++) {
+        float angleA = i / 20.0 * TWO_PI; 
+        float angleB = i / 30.0 * TWO_PI; 
+        float heightGap = 3 + cos(heightOffset);
+        float noiseValue = 20 + 190 * noise(i / noiseScale); 
+        
+        corps.fill(noiseValue, noiseValue, 75);
+        
+        float radiusVariation = 8 * cos(i * PI / 200.); 
+        float outerRadius = baseRadius + radiusVariation;
+        float finalRadius = outerRadius + cos(angleB);
+        
+        corps.vertex(finalRadius * cos(angleA), finalRadius * sin(angleA), heightGap + i); // Premier sommet
+        
+        radiusVariation = 8 * cos((i + stepSize) * PI / 200.); // second sommet
+        outerRadius = baseRadius + radiusVariation;
+        finalRadius = outerRadius + cos(angleB);
+        
+        corps.vertex(finalRadius * cos(angleA + da), finalRadius * sin(angleA + da), heightGap + (i + stepSize)); // second sommet
     }
-  }
-  
-  corps.endShape();
-  return corps;
-}
-
-// Peut-être ne pas mettre les yeux dans le PShape et les draw à l'exécution ?
-PShape creerYeuxMomie() {
-  PShape yeux = createShape(GROUP);
-  
-  for (int i = -1; i <= 1; i += 2) {
-    PShape oeil = createShape(SPHERE, 10);
-    oeil.setStroke(0);
-    oeil.translate(i * 20, -100, 40);
-    oeil.setFill(color(0, 128, 0, 192));
     
-    yeux.addChild(oeil);
-  }
-  
-  return yeux;
+    corps.endShape(CLOSE);
+    return corps;
 }
 
+PShape creerTeteMomie() {
+    PShape head = createShape();
+    head.beginShape(QUAD_STRIP);
+    head.noStroke();
+    head.rotateX(PI / 2);
+
+    // Dessiner la tête en utilisant une bande de quads
+    for (int i = -100; i <= 90; i++) {
+        float angle1 = i / 22.0f * TWO_PI;
+        float angle2 = i / 32.0f * TWO_PI;
+        float noiseValue = 25 + 185 * noise(i / 11.f);
+        float depth = 255 + cos(28.0f);
+
+        head.fill(noiseValue, noiseValue, 55);
+
+        // rayons pour les sommets
+        float radius2 = 16 + 34 * cos(i * PI / 195) + cos(angle2);
+
+        // Ajouter les sommets à la forme
+        head.vertex(radius2 * cos(angle1), radius2 * sin(angle1), depth + i);
+
+        radius2 = 15 + 35 * cos((i + 25) * PI / 195) + cos(angle2);
+
+        head.vertex(radius2 * cos(angle1 + da), radius2 * sin(angle1 + da), depth + i + 24);
+    }
+
+    head.endShape(CLOSE);
+    return head;
+}
+
+// Suggestion prof : un PShape pour l'oeil et l'autre pour la pupille
+PShape creerYeuxMomie() {
+    PShape eyes = createShape(GROUP);
+
+    for (int i = -1; i <= 1; i += 2) {
+        float xPosition = i * 16;
+
+        // createShape(ELLIPSE, 0, 0, 10, 15); ????????? NE FONCTIONNE PAS
+        PShape eye = createShape(SPHERE, 10);
+        eye.translate(xPosition, -280, 40);
+        eye.setStroke(false);
+
+        PShape eyeball = createShape(SPHERE, 5);
+        eyeball.translate(xPosition, -280, 45);
+        eyeball.setFill(color(0));
+
+        eyes.addChild(eye);
+        eyes.addChild(eyeball);
+    }
+
+    return eyes;
+}
+
+// TODO: à refaire
 PShape creerBrasMomie() {
   PShape bras = createShape(GROUP);
 
