@@ -25,7 +25,7 @@ void draw() {
   //directionalLight(204, 204, 204, -dirX, -dirY, -1);
   
   translate(width / 2, height / 2);
-  rotateY(frameCount * 0.02);
+  //rotateY(frameCount * 0.02);
   
   shape(momie);
 }
@@ -77,7 +77,7 @@ PShape creerTeteMomie() {
     for (int i = -100; i <= 90; i++) {
         float angle1 = i / 22.0f * TWO_PI;
         float angle2 = i / 32.0f * TWO_PI;
-        float noiseValue = 25 + 185 * noise(i / 11.f);
+        float noiseValue = 55 + 155 * noise(i / 11.f);
         float depth = 255 + cos(28.0f);
 
         head.fill(noiseValue, noiseValue, 55);
@@ -104,20 +104,14 @@ PShape creerYeuxMomie() {
     for (int i = -1; i <= 1; i += 2) {
         float xPosition = i * 16;
 
-        // createShape(ELLIPSE, 0, 0, 10, 15); ????????? NE FONCTIONNE PAS
         PShape eye = createShape(SPHERE, 10);
-        eye.translate(xPosition, -280, 40);
-        
-        //PShape eye = createShape(ELLIPSE, 0, 0, 20, 15);
-        //eye.translate(xPosition, -280, 45);
-        
+        eye.scale(1.7, 1., 1.);
+        eye.translate(xPosition, -280, 35);
         eye.setStroke(false);
 
-        PShape eyeball = createShape(SPHERE, 5);
-        eyeball.translate(xPosition, -280, 45);
-        
-        //PShape eyeball = createShape(ELLIPSE, 0, 0, 5, 10);
-        //eyeball.translate(xPosition, -280, 50);
+        PShape eyeball = createShape(SPHERE, 3);
+        eyeball.scale(1., 1.7, 1.);
+        eyeball.translate(xPosition + i * 7, -280, 42);
         
         eyeball.setFill(color(0));
 
@@ -126,36 +120,4 @@ PShape creerYeuxMomie() {
     }
 
     return eyes;
-}
-
-// TODO: à refaire
-PShape creerBrasMomie() {
-  PShape bras = createShape(GROUP);
-
-  for (int i = -1; i <= 1; i += 2) {
-    PShape brasSpiral = createShape();
-    brasSpiral.beginShape(QUAD_STRIP);
-    float longueur = 100;
-    float baseRadius = 20;
-
-    for (int j = 0; j < 40; j++) {
-      float angle = j * TWO_PI * 3 / 40;
-      float z = j * longueur / 40 - longueur / 2;
-      float radius = baseRadius + noise(j * 0.1) * 5;
-
-      for (int k = 0; k < 2; k++) {
-        float a = angle + k * PI / 10;
-        float x = radius * cos(a);
-        float y = radius * sin(a);
-        brasSpiral.fill(180 + noise(j * 0.1) * 50, 160 + noise(j * 0.1) * 40, 140);
-        brasSpiral.vertex(x, y, z);
-      }
-    }
-
-    brasSpiral.endShape();
-    brasSpiral.translate(i * 70, -50, 40);
-    brasSpiral.rotateY(TWO_PI * i);
-    bras.addChild(brasSpiral);
-  }
-  return bras;
 }
