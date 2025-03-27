@@ -26,7 +26,6 @@ void draw() {
   
   translate(width / 2, height / 2);
   rotateY(frameCount * 0.02);
-  //rotateY(0.02);
   
   shape(momie);
 }
@@ -47,7 +46,7 @@ PShape creerCorpsMomie() {
         float angleA = i / 20.0 * TWO_PI; 
         float angleB = i / 30.0 * TWO_PI; 
         float heightGap = 3 + cos(heightOffset);
-        float noiseValue = 20 + 190 * noise(i / noiseScale); 
+        float noiseValue = 100 + 110 * noise(i / noiseScale); // augmenter min et diminuer max
         
         corps.fill(noiseValue, noiseValue, 75);
         
@@ -108,10 +107,18 @@ PShape creerYeuxMomie() {
         // createShape(ELLIPSE, 0, 0, 10, 15); ????????? NE FONCTIONNE PAS
         PShape eye = createShape(SPHERE, 10);
         eye.translate(xPosition, -280, 40);
+        
+        //PShape eye = createShape(ELLIPSE, 0, 0, 20, 15);
+        //eye.translate(xPosition, -280, 45);
+        
         eye.setStroke(false);
 
         PShape eyeball = createShape(SPHERE, 5);
         eyeball.translate(xPosition, -280, 45);
+        
+        //PShape eyeball = createShape(ELLIPSE, 0, 0, 5, 10);
+        //eyeball.translate(xPosition, -280, 50);
+        
         eyeball.setFill(color(0));
 
         eyes.addChild(eye);
