@@ -2,7 +2,7 @@ float da = PI / 50.; // angle pour la rotation
 PShape momie;
 
 void setup() {
-  size(500, 800, P3D);
+  size(500, 700, P3D);
   frameRate(20);
   
   momie = createShape(GROUP);
