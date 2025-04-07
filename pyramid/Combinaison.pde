@@ -1,5 +1,7 @@
 // variables pour le labyrinthe interieure 
+
 Labyrinthe lab;
+
 int iposX = 1;
 int iposY = -1;
 int posX = iposX;
@@ -35,6 +37,11 @@ float porteX = 0; // Position X de la porte
 float porteY = 0; // Position Y de la porte
 float porteZ = 0; // Position Z de la porte
 
+int etageActuel=0;
+int[] taillesEtages ={21,15,11,9,7};
+ArrayList<Labyrinthe> labyrinthes = new ArrayList<>();
+
+
 
 void setup() {
   //size(800, 800, P3D);
@@ -54,11 +61,20 @@ void setup() {
   float hauteurNiveau = 60;
   
   sable = new Sable(200, 5, 40, 20.0);
-  lab = new Labyrinthe(textureMur, 16);
+  //lab = new Labyrinthe(textureMur, taillesEtages[etageActuel]);
+  
+    for (int taille : taillesEtages) {
+    labyrinthes.add(new Labyrinthe(textureMur, taille)); 
+  }
+  
+  lab= labyrinthes.get(0);
   pyramide = new Pyramide(tailleBase, nbEtages, tailleCellule, hauteurNiveau, texturePierre, textureSommet, texturePorte);
   pyramide1 = new Pyramide(21, 9, 40, 60, texturePierre, textureSommet, texturePorte);
   pyramide2 = new Pyramide(25, 10, 40, 60, texturePierre, textureSommet, texturePorte);
   
+  
+
+ 
 }
 
 void draw() {
@@ -144,6 +160,30 @@ void draw() {
 
   noStroke();
   lab.display(inLab);
+  
+  //-----------------------------------------------------------------
+
+
+  // Vérifier si le joueur a atteint la sortie
+   if (posX == lab.LAB_SIZE-1 && posY == lab.LAB_SIZE-2) {
+    etageActuel++;
+    if (etageActuel < labyrinthes.size()) {
+      lab = labyrinthes.get(etageActuel);
+      posX = 1; 
+      posY = 0;
+      dirX = 0; 
+      dirY = 1;
+      
+      // Réinitialisation graphique profonde
+      resetMatrix();
+      textureMode(NORMAL);
+    } else {
+      inLabyrinthe = false;
+    }
+  }
+  
+  
+  
     return;
   }
   
