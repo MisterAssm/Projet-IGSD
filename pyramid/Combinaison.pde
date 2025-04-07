@@ -91,14 +91,14 @@ void setup() {
 // ==================== FONCTIONS PRINCIPALES ====================
 
 void draw() {
-  if (vuealternative) {
-    dessinerVueExterieure();
-  } else {
-    dessinerVuePyramide();
-  }
-  
   if (inLabyrinthe) {
     dessinerLabyrinthe();
+  } else {
+    if (vuealternative) {
+      dessinerVueExterieure();
+    } else {
+      dessinerVuePyramide();
+    }
   }
 }
 
@@ -180,9 +180,7 @@ void dessinerLabyrinthe() {
   // Afficher la minimap en haut à gauche
   pushMatrix();
   minimap.drawMinimap();
-  
-  // Indiquer la position du joueur sur la minimap
-  dessinerPositionJoueurMinimap();
+  popMatrix();  // Ajout du popMatrix manquant
 
   // Ajuster la perspective et la caméra selon l'animation
   ajusterCameraLabyrinthe();
@@ -221,19 +219,6 @@ void setupLabyrintheCameraLights() {
          width/2.0, height/2.0, 0, 0, 1, 0);
   noLights();
   stroke(0);
-}
-
-/**
- * Dessine un marqueur pour la position du joueur sur la minimap
- */
-void dessinerPositionJoueurMinimap() {
-  pushMatrix();
-  fill(0, 255, 0);
-  noStroke();
-  float wallW = width/lab.getSize();
-  float wallH = height/lab.getSize();
-  translate(50+posX*wallW/8, 50+posY*wallH/8, 50);
-  popMatrix();
 }
 
 /**

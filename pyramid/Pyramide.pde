@@ -116,9 +116,6 @@ public void afficherLabyrinthe(char[][] labyrinthe) {
     
     // Dessiner la porte avec l'échelle
     dessinerPorte(scalePorte);
-    
- 
-
   }
 
   
@@ -251,6 +248,7 @@ public void afficherLabyrinthe(char[][] labyrinthe) {
 
     popMatrix();
 }*/
+
 void dessinerPorte(float scalePorte) {
     textureMode(NORMAL);
     textureWrap(REPEAT);
