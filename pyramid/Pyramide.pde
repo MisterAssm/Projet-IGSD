@@ -50,7 +50,14 @@ class Pyramide {
     creerCoquePyramide();
   }
   
-  
+public void afficherLabyrinthe(char[][] labyrinthe) {
+  for (int j = 0; j < labyrinthe.length; j++) {
+    for (int i = 0; i < labyrinthe.length; i++) {
+      print(labyrinthe[j][i]);
+    }
+    println("");
+  }
+}
   
   void creerCoquePyramide() {
     textureMode(NORMAL);

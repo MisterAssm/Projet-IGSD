@@ -64,10 +64,10 @@ void setup() {
   //lab = new Labyrinthe(textureMur, taillesEtages[etageActuel]);
   
     for (int taille : taillesEtages) {
-    labyrinthes.add(new Labyrinthe(textureMur, taille)); 
+    labyrinthes.add(new Labyrinthe(taille, textureMur)); 
   }
   
-  lab= labyrinthes.get(0);
+  lab = labyrinthes.get(0);
   pyramide = new Pyramide(tailleBase, nbEtages, tailleCellule, hauteurNiveau, texturePierre, textureSommet, texturePorte);
   pyramide1 = new Pyramide(21, 9, 40, 60, texturePierre, textureSommet, texturePorte);
   pyramide2 = new Pyramide(25, 10, 40, 60, texturePierre, textureSommet, texturePorte);
@@ -128,15 +128,15 @@ void draw() {
   noLights();
   stroke(0);
   
-  lab.debugDraw();
+  // TODO: Afficher carte en haut à gauche
+  //lab.debugDraw();
   
   pushMatrix();
   fill(0, 255, 0);
   noStroke();
-  float wallW = width/lab.LAB_SIZE;
-  float wallH = height/lab.LAB_SIZE;
+  float wallW = width/lab.getSize();
+  float wallH = height/lab.getSize();
   translate(50+posX*wallW/8, 50+posY*wallH/8, 50);
-  sphere(3);
   popMatrix();
 
   stroke(0);
@@ -159,13 +159,13 @@ void draw() {
   pointLight(255, 255, 255, posX*wallW, posY*wallH, 15);
 
   noStroke();
-  lab.display(inLab);
+  lab.getAffichage().display(inLab);
   
   //-----------------------------------------------------------------
 
 
   // Vérifier si le joueur a atteint la sortie
-   if (posX == lab.LAB_SIZE-1 && posY == lab.LAB_SIZE-2) {
+   if (posX == lab.getSize()-1 && posY == lab.getSize()-2) {
     etageActuel++;
     if (etageActuel < labyrinthes.size()) {
       lab = labyrinthes.get(etageActuel);

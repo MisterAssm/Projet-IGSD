@@ -1,6 +1,22 @@
-class GenerateurLabyrinthe {
+class Labyrinthe {
   
-  void genererLabyrinthe(char[][] labyrinthe, char[][][] cotes) {
+  private final char[][] labyrinthe;
+  private final char[][][] cotes;
+  private final int size;
+  
+  private final AffichageLabyrinthe affichageLabyrinthe;
+  
+  public Labyrinthe(int size, PImage texture) {
+    this.labyrinthe = new char[size][size];
+    this.cotes = new char[size][size][4];
+    this.size = size;
+    
+    this.genererLabyrinthe(labyrinthe, cotes);
+    
+    this.affichageLabyrinthe = new AffichageLabyrinthe(texture, this);
+  }
+  
+  private void genererLabyrinthe(char[][] labyrinthe, char[][][] cotes) {
     int taille = labyrinthe.length;
     int aCreuser = 0;
     
@@ -10,9 +26,8 @@ class GenerateurLabyrinthe {
     definirEntreesSorties(labyrinthe, taille);
     definirCotes(labyrinthe, cotes, taille);
   }
-
   
-  void initialiserLabyrinthe(char[][] labyrinthe, char[][][] cotes, int taille) {
+  private void initialiserLabyrinthe(char[][] labyrinthe, char[][][] cotes, int taille) {
     for (int j = 0; j < taille; j++) {
       for (int i = 0; i < taille; i++) {
         for (int k = 0; k < 4; k++) {
@@ -23,7 +38,7 @@ class GenerateurLabyrinthe {
     }
   }
   
-  int compterZonesACreuser(char[][] labyrinthe, int taille) {
+  private int compterZonesACreuser(char[][] labyrinthe, int taille) {
     int count = 0;
     for (int j = 1; j < taille; j += 2) {
       for (int i = 1; i < taille; i += 2) {
@@ -35,7 +50,7 @@ class GenerateurLabyrinthe {
     return count;
   }
   
-  void creuserLabyrinthe(char[][] labyrinthe, int taille, int aCreuser) {
+  private void creuserLabyrinthe(char[][] labyrinthe, int taille, int aCreuser) {
     int posX = 1, posY = 1;
     while (aCreuser > 0) {
       int ancienX = posX, ancienY = posY;
@@ -56,12 +71,12 @@ class GenerateurLabyrinthe {
     }
   }
   
-  void definirEntreesSorties(char[][] labyrinthe, int taille) {
+  private void definirEntreesSorties(char[][] labyrinthe, int taille) {
     labyrinthe[0][1] = ' ';
     labyrinthe[taille - 2][taille - 1] = ' ';
   }
   
-  void definirCotes(char[][] labyrinthe, char[][][] cotes, int taille) {
+  private void definirCotes(char[][] labyrinthe, char[][][] cotes, int taille) {
     for (int j = 1; j < taille - 1; j++) {
       for (int i = 1; i < taille - 1; i++) {
         if (labyrinthe[j][i] == ' ') {
@@ -85,4 +100,37 @@ class GenerateurLabyrinthe {
       }
     }
   }
+  
+  public boolean isWall(int x, int y) {
+    if (x < 0 || x >= size || y < 0 || y >= size) {
+      return true;
+    }
+    return labyrinthe[y][x] == '#';
+  }
+  
+ public void afficherLabyrinthe() {
+  for (int j = 0; j < size; j++) {
+    for (int i = 0; i < size; i++) {
+      print(labyrinthe[j][i]);
+    }
+    println("");
+  }
+}
+  
+  public char[][] getLabyrinthe() {
+    return labyrinthe;
+  }
+
+   public char[][][] getCotes() {
+    return cotes;
+  }
+  
+  public int getSize() {
+    return size;
+  }
+  
+  public AffichageLabyrinthe getAffichage() {
+    return affichageLabyrinthe;
+  }
+  
 }
