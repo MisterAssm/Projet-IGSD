@@ -1,3 +1,5 @@
+import processing.opengl.*;
+
 /**
  * Classe Minimap - Affiche une représentation 3D du labyrinthe découvert par le joueur
  * Permet la navigation et visualisation progressive du labyrinthe
@@ -41,27 +43,51 @@ public class Minimap {
     updateDiscoveredArea();
   }
   
-  public void drawMinimap() {
-    // Configuration de base
-    background(20);
-    setupLighting();
-    shader(shader);
-    
-    // Configuration de la caméra
-    pushMatrix();
-    setupCamera();
-    
-    // Dessin du labyrinthe
-    drawLabyrinth();
-    
-    // Dessin du joueur
-    drawPlayer();
-    
-    popMatrix();
-    
-    // Désactiver le shader
-    resetShader();
+public void drawMinimap() {
+  // Sauvegarder l'état actuel du système de coordonnées
+  pushMatrix();
+  
+  // Passer en mode HUD : réinitialiser la caméra et la perspective
+  camera();
+  perspective();
+  
+  // Désactiver le test de profondeur pour que la minimap soit rendue par-dessus le reste
+  hint(DISABLE_DEPTH_TEST);
+  
+  // Définir la taille et la position de la minimap dans le coin en haut à gauche
+  int minimapSize = min(width, height) / 4;  // Taille de la minimap
+  int offsetX = 20;                          // Marge depuis le bord gauche
+  int offsetY = 20;                          // Marge depuis le bord supérieur
+  
+  // Fond de la minimap
+  fill(0, 0, 0, 150);  // Fond noir semi-transparent
+  noStroke();
+  rect(offsetX - 10, offsetY - 10, minimapSize + 20, minimapSize + 20, 5);
+  
+  // Configuration de base pour le dessin de la minimap
+  pushMatrix();
+  setupLighting();
+  shader(shader);
+  
+  // Configuration de la caméra de la minimap
+  pushMatrix();
+  noStroke();
+  setupCamera();
+  
+  // Dessiner le labyrinthe et le joueur
+  drawLabyrinth();
+  drawPlayer();
+  
+  popMatrix();
+  resetShader();
+  popMatrix();
+  
+  // Réactiver le test de profondeur
+  hint(ENABLE_DEPTH_TEST);
+  
+  popMatrix();
 }
+
   
   /**
    * Configure l'éclairage de la scène

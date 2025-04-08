@@ -176,11 +176,6 @@ void dessinerLabyrinthe() {
 
   // Configuration de la caméra et des lumières pour le labyrinthe
   setupLabyrintheCameraLights();
-  
-  // Afficher la minimap en haut à gauche
-  pushMatrix();
-  minimap.drawMinimap();
-  popMatrix();  // Ajout du popMatrix manquant
 
   // Ajuster la perspective et la caméra selon l'animation
   ajusterCameraLabyrinthe();
@@ -188,6 +183,9 @@ void dessinerLabyrinthe() {
   // Dessiner les murs du labyrinthe
   noStroke();
   lab.getAffichage().display(inLab);
+  
+  // Afficher la minimap en haut à gauche
+  minimap.drawMinimap();
   
   // Vérifier si le joueur a atteint la sortie
   verifierSortieEtage();
