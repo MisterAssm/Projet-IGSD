@@ -1,5 +1,3 @@
-import processing.opengl.*;
-
 /**
  * Classe Minimap - Affiche une représentation 3D du labyrinthe découvert par le joueur
  * Permet la navigation et visualisation progressive du labyrinthe
@@ -23,6 +21,8 @@ public class Minimap {
   private float cameraRotY = 0;
   private float zoom = 0.21;
   
+  private PGraphics minimapGraphics;
+  
   /**
    * Constructeur de la minimap
    * @param labyrinthe Le labyrinthe à représenter
@@ -41,52 +41,53 @@ public class Minimap {
     
     // Marquer la zone initiale comme découverte
     updateDiscoveredArea();
+    
+    this.minimapGraphics = createGraphics(width / 4, height / 4, P3D);
   }
   
-public void drawMinimap() {
+  public void drawMinimap() {
   // Sauvegarder l'état actuel du système de coordonnées
   pushMatrix();
-  
+
   // Passer en mode HUD : réinitialiser la caméra et la perspective
   camera();
-  perspective();
-  
-  // Désactiver le test de profondeur pour que la minimap soit rendue par-dessus le reste
-  hint(DISABLE_DEPTH_TEST);
-  
+  ortho();  // Utiliser une projection orthographique pour le HUD
+
   // Définir la taille et la position de la minimap dans le coin en haut à gauche
-  int minimapSize = min(width, height) / 4;  // Taille de la minimap
+  int minimapSize = min(width, height) / 5;  // Taille de la minimap
   int offsetX = 20;                          // Marge depuis le bord gauche
   int offsetY = 20;                          // Marge depuis le bord supérieur
-  
+
   // Fond de la minimap
   fill(0, 0, 0, 150);  // Fond noir semi-transparent
   noStroke();
   rect(offsetX - 10, offsetY - 10, minimapSize + 20, minimapSize + 20, 5);
-  
+
   // Configuration de base pour le dessin de la minimap
   pushMatrix();
   setupLighting();
   shader(shader);
-  
+
   // Configuration de la caméra de la minimap
   pushMatrix();
-  noStroke();
-  setupCamera();
+  translate(offsetX, offsetY);  // Positionner la minimap dans le coin
   
+  // TODO : CHANGER LE SCALE !!!!
+  scale(0.2);  // Mettre à l'échelle pour s'adapter à la taille de la minimap
+
   // Dessiner le labyrinthe et le joueur
   drawLabyrinth();
   drawPlayer();
-  
+
   popMatrix();
   resetShader();
   popMatrix();
-  
-  // Réactiver le test de profondeur
-  hint(ENABLE_DEPTH_TEST);
-  
+
   popMatrix();
 }
+
+
+
 
   
   /**
