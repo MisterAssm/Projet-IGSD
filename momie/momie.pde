@@ -4,29 +4,29 @@ PShape momie;
 void setup() {
   size(500, 700, P3D);
   frameRate(20);
-  
+
   momie = createShape(GROUP);
   PShape corps = creerCorpsMomie();
   PShape tete = creerTeteMomie();
   PShape yeux = creerYeuxMomie();
-  //PShape bras = creerBrasMomie();
-  
+  PShape bras = creerBrasMomie();
+
   momie.addChild(corps);
   momie.addChild(tete);
   momie.addChild(yeux);
-  //momie.addChild(bras);
+  momie.addChild(bras);
 }
 
 void draw() {
   background(192);
-  
+
   float dirY = (mouseY / float(height) - 0.5) * 2;
   float dirX = (mouseX / float(width) - 0.5) * 2;
   //directionalLight(204, 204, 204, -dirX, -dirY, -1);
-  
+
   translate(width / 2, height / 2);
   //rotateY(frameCount * 0.02);
-  
+
   shape(momie);
 }
 
@@ -35,34 +35,34 @@ PShape creerCorpsMomie() {
     float baseRadius = 60;
     float noiseScale = 5.; // variation de couleur
     float heightOffset = PI / 6.;
-    int stepSize = 25; 
-    
+    int stepSize = 25;
+
     PShape corps = createShape();
     corps.beginShape(QUAD_STRIP);
     corps.noStroke();
     corps.rotateX(PI / 2); // rotation pour aligner correctement la forme
-    
+
     for (int i = -200; i <= 200; i++) {
-        float angleA = i / 20.0 * TWO_PI; 
-        float angleB = i / 30.0 * TWO_PI; 
+        float angleA = i / 20.0 * TWO_PI;
+        float angleB = i / 30.0 * TWO_PI;
         float heightGap = 3 + cos(heightOffset);
-        float noiseValue = 100 + 110 * noise(i / noiseScale); // augmenter min et diminuer max
-        
+        float noiseValue = 55 + 155 * noise(i / noiseScale); // augmenter min et diminuer max
+
         corps.fill(noiseValue, noiseValue, 75);
-        
-        float radiusVariation = 8 * cos(i * PI / 200.); 
+
+        float radiusVariation = 8 * cos(i * PI / 200.);
         float outerRadius = baseRadius + radiusVariation;
         float finalRadius = outerRadius + cos(angleB);
-        
+
         corps.vertex(finalRadius * cos(angleA), finalRadius * sin(angleA), heightGap + i); // Premier sommet
-        
+
         radiusVariation = 8 * cos((i + stepSize) * PI / 200.); // second sommet
         outerRadius = baseRadius + radiusVariation;
         finalRadius = outerRadius + cos(angleB);
-        
+
         corps.vertex(finalRadius * cos(angleA + da), finalRadius * sin(angleA + da), heightGap + (i + stepSize)); // second sommet
     }
-    
+
     corps.endShape(CLOSE);
     return corps;
 }
@@ -112,7 +112,7 @@ PShape creerYeuxMomie() {
         PShape eyeball = createShape(SPHERE, 3);
         eyeball.scale(1., 1.7, 1.);
         eyeball.translate(xPosition + i * 7, -280, 42);
-        
+
         eyeball.setFill(color(0));
 
         eyes.addChild(eye);
@@ -120,4 +120,51 @@ PShape creerYeuxMomie() {
     }
 
     return eyes;
+}
+
+PShape creerBrasMomie() {
+    PShape bras = createShape(GROUP);
+
+    for (int direction = -1; direction <= 1; direction += 2) {
+        PShape brasForme = createShape();
+        brasForme.beginShape(QUAD_STRIP);
+        brasForme.noStroke();
+        brasForme.rotateX(PI / 2);
+
+        for (int i = -100; i <= 100; i++) {
+            float angleA = i / 20.0 * TWO_PI;
+            float angleB = i / 30.0 * TWO_PI;
+            float noiseValue = 55 + 155 * noise(i / 5.);
+
+            float radiusVariation = 8 * cos(i * PI / 100.);
+            float outerRadius = 20 + radiusVariation;
+            float finalRadius = outerRadius + cos(angleB);
+
+            brasForme.fill(noiseValue, noiseValue, 75);
+
+            // Épaules plus volumineuses
+            if (i < -50) {
+                finalRadius *= 1.5;
+            }
+            // Coudes plus petits
+            else if (i > -50 && i < 0) {
+                finalRadius *= 0.7;
+            }
+            // Avant-bras plus volumineux
+            else if (i > 0 && i < 50) {
+                finalRadius *= 1.3;
+            }
+
+            brasForme.vertex(finalRadius * cos(angleA), finalRadius * sin(angleA), i);
+            brasForme.vertex(finalRadius * cos(angleA + da), finalRadius * sin(angleA + da), i + 25);
+        }
+
+        brasForme.endShape(CLOSE);
+        brasForme.rotateZ(-direction * PI / 3); // Rotation de ±90 degrés autour de l'axe Z
+        brasForme.rotateY(-direction * PI / 4);
+        brasForme.translate(direction * 80, -100, 0);
+        bras.addChild(brasForme);
+    }
+
+    return bras;
 }
