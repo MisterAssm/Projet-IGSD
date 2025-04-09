@@ -109,15 +109,11 @@ void draw() {
  * Charge toutes les textures nécessaires
  */
 void chargerTextures() {
-  texturePierre = loadImage("text.jpg");
-  textureSommet = loadImage("cpt.jpg");
-  texturePorte = loadImage("p.png");
-  textureMur = loadImage("stones.jpg");
-  textureSol=loadImage("s.jpg");
-   // Vérifiez si les textures sont nulles après le chargement
-  if (textureSol == null) {
-    println("Erreur : La texture du sol n'a pas pu être chargée.");
-  }
+  texturePierre = loadImage("assets/images/pyramide_brique.jpg");
+  textureSommet = loadImage("assets/images/pyramide_haut.jpg");
+  texturePorte = loadImage("assets/images/pyramide_porte.png");
+  textureMur = loadImage("assets/images/mur_stones.jpg");
+  textureSol=loadImage("assets/images/sol_stones.jpg");
 }
 
 /**

@@ -1,8 +1,6 @@
 public class Minimap {
-  // ==================== CONSTANTES ====================
-  private static final int VIEW_DISTANCE = 3;  // Rayon de visibilité autour du joueur
   
-  // ==================== ATTRIBUTS ====================
+  private static final int VIEW_DISTANCE = 3;  // Rayon de visibilité autour du joueur
   
   private Labyrinthe labyrinthe;
   private int boxSize;
@@ -15,7 +13,7 @@ public class Minimap {
   
   public Minimap(Labyrinthe labyrinthe) {
     this.labyrinthe = labyrinthe;
-    this.shader = loadShader("LabyColor.glsl", "LabyTexture.glsl");
+    this.shader = loadShader("assets/shaders/LabyColor.glsl", "assets/shaders/LabyTexture.glsl");
     this.boxSize = (width / labyrinthe.getSize()) - 5;
     
     // Initialisation de la matrice des zones découvertes
@@ -162,9 +160,6 @@ public class Minimap {
     endShape();
   }
   
-  /**
-   * Dessine un sol (face plane)
-   */
   private void drawFloor() {
     beginShape(QUADS);
     vertex(0, 0, 0);

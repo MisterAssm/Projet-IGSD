@@ -1,6 +1,5 @@
-
-
 class Pyramide {
+  
   ArrayList<DonneesEtage> etages;
   float tailleCellule;
   float hauteurNiveau;
@@ -15,7 +14,7 @@ class Pyramide {
     
     this.texturePierre = texturePierre;
     this.textureSommet = textureSommet;
-     this.texturePorte = texturePorte;
+    this.texturePorte = texturePorte;
     
     this.etages = new ArrayList<DonneesEtage>();
     this.groupeMurs = createShape(GROUP);
@@ -50,14 +49,14 @@ class Pyramide {
     creerCoquePyramide();
   }
   
-public void afficherLabyrinthe(char[][] labyrinthe) {
-  for (int j = 0; j < labyrinthe.length; j++) {
-    for (int i = 0; i < labyrinthe.length; i++) {
-      print(labyrinthe[j][i]);
+  public void afficherLabyrinthe(char[][] labyrinthe) {
+    for (int j = 0; j < labyrinthe.length; j++) {
+      for (int i = 0; i < labyrinthe.length; i++) {
+        print(labyrinthe[j][i]);
+      }
+      println("");
     }
-    println("");
   }
-}
   
   void creerCoquePyramide() {
     textureMode(NORMAL);
@@ -193,120 +192,65 @@ public void afficherLabyrinthe(char[][] labyrinthe) {
 
     endShape();
   }
+
+  void dessinerPorte(float scalePorte) {
+      textureMode(NORMAL);
+      textureWrap(REPEAT);
   
-/*void dessinerPorte() {
-    textureMode(NORMAL);
-    textureWrap(REPEAT);
-
-    // Choisir l'étage où placer la porte (ici le premier étage)
-    DonneesEtage etageAvecPorte = etages.get(0);
-    float largeurPorte = tailleCellule ; // Largeur totale de la porte
-    float hauteurPorte = tailleCellule * 10; // Nouvelle hauteur totale de la porte
-    float profondeurPorte = tailleCellule * 1; // Profondeur de la porte
-
-    float xPorte = etageAvecPorte.decalX + etageAvecPorte.larg * tailleCellule / 2 - largeurPorte / 2; // Centrer la porte
-    float yPorte = etageAvecPorte.decalY;
-    float zBase = etageAvecPorte.decalZ;
-
-    // Dessiner le cadre de la porte
-    texture(texturePorte);
-    pushMatrix();
-    translate(xPorte, yPorte, zBase);
-    noStroke();
-
-    // Dessiner le cadre supérieur
-    beginShape(QUADS);
-    texture(texturePorte);
-    vertex(0, 0, 0, 0, 0);
-    vertex(largeurPorte, 0, 0, 1, 0);
-    vertex(largeurPorte, 0, profondeurPorte, 1, 1);
-    vertex(0, 0, profondeurPorte, 0, 1);
-    endShape();
-
-    // Dessiner les côtés du cadre
-    beginShape(QUADS);
-    texture(texturePorte);
-    vertex(0, 0, 0, 0, 0);
-    vertex(0, hauteurPorte, 0, 0, 1);
-    vertex(0, hauteurPorte, profondeurPorte, 1, 1);
-    vertex(0, 0, profondeurPorte, 1, 0);
-
-    vertex(largeurPorte, 0, 0, 0, 0);
-    vertex(largeurPorte, hauteurPorte, 0, 1, 0);
-    vertex(largeurPorte, hauteurPorte, profondeurPorte, 1, 1);
-    vertex(largeurPorte, 0, profondeurPorte, 0, 1);
-    endShape();
-
-    // Dessiner la partie centrale de la porte
-    beginShape(QUADS);
-    texture(texturePorte);
-    vertex(0, 0, profondeurPorte, 0, 0);
-    vertex(largeurPorte, 0, profondeurPorte, 1, 0);
-    vertex(largeurPorte, hauteurPorte, profondeurPorte, 1, 1);
-    vertex(0, hauteurPorte, profondeurPorte, 0, 1);
-    endShape();
-
-    popMatrix();
-}*/
-
-void dessinerPorte(float scalePorte) {
-    textureMode(NORMAL);
-    textureWrap(REPEAT);
-
-    // Dimensions de base
-    float largeurBase = tailleCellule;
-    float hauteurBase = tailleCellule * 10;
-    float profondeurBase = tailleCellule;
-
-    // Appliquer l'échelle
-    float largeurPorte = largeurBase * scalePorte;
-    float hauteurPorte = hauteurBase * scalePorte;
-    float profondeurPorte = profondeurBase * scalePorte;
-
-    // Position (au centre du premier étage)
-    DonneesEtage etage = etages.get(0);
-    float xPorte = etage.decalX + etage.larg * tailleCellule / 2 - largeurPorte / 2;
-    float yPorte = etage.decalY - (hauteurPorte - tailleCellule) / 2; // Centrage vertical
-    float zBase = etage.decalZ;
-
-    // Dessin avec push/popMatrix pour isoler les transformations
-    pushMatrix();
-       texture(texturePorte);
-    translate(xPorte, yPorte, zBase);
-    noStroke();
-    texture(texturePorte);
-
-    // Face avant
-    beginShape(QUADS);
-       texture(texturePorte);
-    vertex(0, 0, profondeurPorte, 0, 0);
-    vertex(largeurPorte, 0, profondeurPorte, 1, 0);
-    vertex(largeurPorte, hauteurPorte, profondeurPorte, 1, 1);
-    vertex(0, hauteurPorte, profondeurPorte, 0, 1);
-    endShape();
-
-    // Cadre (côtés et haut)
-    beginShape(QUADS);
-       texture(texturePorte);
-    // Côté gauche
-    vertex(0, 0, 0, 0, 0);
-    vertex(0, 0, profondeurPorte, 1, 0);
-    vertex(0, hauteurPorte, profondeurPorte, 1, 1);
-    vertex(0, hauteurPorte, 0, 0, 1);
-    // Côté droit
-    vertex(largeurPorte, 0, 0, 0, 0);
-    vertex(largeurPorte, hauteurPorte, 0, 0, 1);
-    vertex(largeurPorte, hauteurPorte, profondeurPorte, 1, 1);
-    vertex(largeurPorte, 0, profondeurPorte, 1, 0);
-    // Haut
-    vertex(0, 0, 0, 0, 0);
-    vertex(largeurPorte, 0, 0, 1, 0);
-    vertex(largeurPorte, 0, profondeurPorte, 1, 1);
-    vertex(0, 0, profondeurPorte, 0, 1);
-    endShape();
-
-    popMatrix();
-}
+      // Dimensions de base
+      float largeurBase = tailleCellule;
+      float hauteurBase = tailleCellule * 10;
+      float profondeurBase = tailleCellule;
+  
+      // Appliquer l'échelle
+      float largeurPorte = largeurBase * scalePorte;
+      float hauteurPorte = hauteurBase * scalePorte;
+      float profondeurPorte = profondeurBase * scalePorte;
+  
+      // Position (au centre du premier étage)
+      DonneesEtage etage = etages.get(0);
+      float xPorte = etage.decalX + etage.larg * tailleCellule / 2 - largeurPorte / 2;
+      float yPorte = etage.decalY - (hauteurPorte - tailleCellule) / 2; // Centrage vertical
+      float zBase = etage.decalZ;
+  
+      // Dessin avec push/popMatrix pour isoler les transformations
+      pushMatrix();
+         texture(texturePorte);
+      translate(xPorte, yPorte, zBase);
+      noStroke();
+      texture(texturePorte);
+  
+      // Face avant
+      beginShape(QUADS);
+         texture(texturePorte);
+      vertex(0, 0, profondeurPorte, 0, 0);
+      vertex(largeurPorte, 0, profondeurPorte, 1, 0);
+      vertex(largeurPorte, hauteurPorte, profondeurPorte, 1, 1);
+      vertex(0, hauteurPorte, profondeurPorte, 0, 1);
+      endShape();
+  
+      // Cadre (côtés et haut)
+      beginShape(QUADS);
+         texture(texturePorte);
+      // Côté gauche
+      vertex(0, 0, 0, 0, 0);
+      vertex(0, 0, profondeurPorte, 1, 0);
+      vertex(0, hauteurPorte, profondeurPorte, 1, 1);
+      vertex(0, hauteurPorte, 0, 0, 1);
+      // Côté droit
+      vertex(largeurPorte, 0, 0, 0, 0);
+      vertex(largeurPorte, hauteurPorte, 0, 0, 1);
+      vertex(largeurPorte, hauteurPorte, profondeurPorte, 1, 1);
+      vertex(largeurPorte, 0, profondeurPorte, 1, 0);
+      // Haut
+      vertex(0, 0, 0, 0, 0);
+      vertex(largeurPorte, 0, 0, 1, 0);
+      vertex(largeurPorte, 0, profondeurPorte, 1, 1);
+      vertex(0, 0, profondeurPorte, 0, 1);
+      endShape();
+  
+      popMatrix();
+  }
 
 
 }
