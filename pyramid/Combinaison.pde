@@ -28,6 +28,7 @@ PImage texturePierre;            // Texture pour les murs extérieurs
 PImage textureSommet;            // Texture pour le sommet de la pyramide
 PImage texturePorte;             // Texture pour la porte d'entrée
 PImage textureMur;               // Texture pour les murs du labyrinthe
+PImage textureSol;               // Texture pour le sol du labyrinthe
 
 // === CAMÉRA EXTÉRIEURE ===
 float camX = 0;                  // Position X de la caméra
@@ -112,6 +113,11 @@ void chargerTextures() {
   textureSommet = loadImage("cpt.jpg");
   texturePorte = loadImage("p.png");
   textureMur = loadImage("stones.jpg");
+  textureSol=loadImage("s.jpg");
+   // Vérifiez si les textures sont nulles après le chargement
+  if (textureSol == null) {
+    println("Erreur : La texture du sol n'a pas pu être chargée.");
+  }
 }
 
 /**
@@ -119,7 +125,7 @@ void chargerTextures() {
  */
 void creerLabyrinthes() {
   for (int taille : taillesEtages) {
-    labyrinthes.add(new Labyrinthe(taille, textureMur)); 
+    labyrinthes.add(new Labyrinthe(taille, textureMur, textureSol)); 
   }
 }
 

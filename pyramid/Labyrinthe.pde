@@ -6,14 +6,14 @@ class Labyrinthe {
   
   private final AffichageLabyrinthe affichageLabyrinthe;
   
-  public Labyrinthe(int size, PImage texture) {
+  public Labyrinthe(int size, PImage texture, PImage textureSol) {
     this.labyrinthe = new char[size][size];
     this.cotes = new char[size][size][4];
     this.size = size;
     
     this.genererLabyrinthe(labyrinthe, cotes);
     
-    this.affichageLabyrinthe = new AffichageLabyrinthe(texture, this);
+    this.affichageLabyrinthe = new AffichageLabyrinthe(texture, this,textureSol);
   }
   
   private void genererLabyrinthe(char[][] labyrinthe, char[][][] cotes) {
