@@ -13,11 +13,6 @@ public class Minimap {
   private int playerX;
   private int playerY;
   
-  // Contrôles de caméra
-  private float cameraRotX = 0;
-  private float cameraRotY = 0;
-  private float zoom = 0.21;
-  
   public Minimap(Labyrinthe labyrinthe) {
     this.labyrinthe = labyrinthe;
     this.shader = loadShader("LabyColor.glsl", "LabyTexture.glsl");
@@ -264,11 +259,5 @@ private void drawPlayer() {
     if (update) {
       updateDiscoveredArea();
     }
-  }
-  
-  public void resetCamera() {
-    this.cameraRotX = 0;
-    this.cameraRotY = 0;
-    this.zoom = 0.21;
   }
 }
