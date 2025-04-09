@@ -1,16 +1,13 @@
-/**
- * Classe Minimap - Affiche une représentation 3D du labyrinthe découvert par le joueur
- * Permet la navigation et visualisation progressive du labyrinthe
- */
 public class Minimap {
   // ==================== CONSTANTES ====================
   private static final int VIEW_DISTANCE = 3;  // Rayon de visibilité autour du joueur
   
   // ==================== ATTRIBUTS ====================
-  private Labyrinthe labyrinthe;          // Référence au labyrinthe
-  private int boxSize;                    // Taille d'une case sur la minimap
-  private boolean[][] discovered;         // Zones découvertes par le joueur
-  private PShader shader;                 // Shader pour les effets visuels
+  
+  private Labyrinthe labyrinthe;
+  private int boxSize;
+  private boolean[][] discovered;
+  private PShader shader;
   
   // Position du joueur
   private int playerX;
@@ -21,12 +18,6 @@ public class Minimap {
   private float cameraRotY = 0;
   private float zoom = 0.21;
   
-  private PGraphics minimapGraphics;
-  
-  /**
-   * Constructeur de la minimap
-   * @param labyrinthe Le labyrinthe à représenter
-   */
   public Minimap(Labyrinthe labyrinthe) {
     this.labyrinthe = labyrinthe;
     this.shader = loadShader("LabyColor.glsl", "LabyTexture.glsl");
@@ -41,58 +32,37 @@ public class Minimap {
     
     // Marquer la zone initiale comme découverte
     updateDiscoveredArea();
-    
-    this.minimapGraphics = createGraphics(width / 4, height / 4, P3D);
   }
   
   public void drawMinimap() {
-  // Sauvegarder l'état actuel du système de coordonnées
-  pushMatrix();
-
-  // Passer en mode HUD : réinitialiser la caméra et la perspective
-  camera();
-  ortho();  // Utiliser une projection orthographique pour le HUD
-
-  // Définir la taille et la position de la minimap dans le coin en haut à gauche
-  int minimapSize = min(width, height) / 5;  // Taille de la minimap
-  int offsetX = 20;                          // Marge depuis le bord gauche
-  int offsetY = 20;                          // Marge depuis le bord supérieur
-
-  // Fond de la minimap
-  fill(0, 0, 0, 150);  // Fond noir semi-transparent
-  noStroke();
-  rect(offsetX - 10, offsetY - 10, minimapSize + 20, minimapSize + 20, 5);
-
-  // Configuration de base pour le dessin de la minimap
-  pushMatrix();
-  setupLighting();
-  shader(shader);
-
-  // Configuration de la caméra de la minimap
-  pushMatrix();
-  translate(offsetX, offsetY);  // Positionner la minimap dans le coin
+    pushMatrix();
   
-  // TODO : CHANGER LE SCALE !!!!
-  scale(0.2);  // Mettre à l'échelle pour s'adapter à la taille de la minimap
-
-  // Dessiner le labyrinthe et le joueur
-  drawLabyrinth();
-  drawPlayer();
-
-  popMatrix();
-  resetShader();
-  popMatrix();
-
-  popMatrix();
-}
-
-
-
-
+    // Passer en mode HUD : réinitialiser la caméra et la perspective
+    camera();
+    ortho();
   
-  /**
-   * Configure l'éclairage de la scène
-   */
+    int offsetX = 20; // Marge depuis le bord gauche
+    int offsetY = 20; // Marge depuis le bord supérieur
+  
+    pushMatrix();
+    setupLighting();
+    shader(shader);
+  
+    pushMatrix();
+    translate(offsetX, offsetY);  // Positionner la minimap dans le coin
+    scale(0.2);
+  
+    // Dessiner le labyrinthe et le joueur
+    drawLabyrinth();
+    drawPlayer();
+  
+    popMatrix();
+    resetShader();
+    popMatrix();
+  
+    popMatrix();
+  }
+  
   private void setupLighting() {
     ambientLight(60, 60, 60);
     directionalLight(200, 200, 200, 0, 0, -1);
@@ -100,16 +70,6 @@ public class Minimap {
                playerX * boxSize + boxSize/2, 
                playerY * boxSize + boxSize/2, 
                boxSize * 2);
-  }
-  
-  /**
-   * Configure la caméra (position, rotation, zoom)
-   */
-  private void setupCamera() {
-    rotateX(cameraRotX);
-    rotateY(cameraRotY);
-    scale(zoom);
-    translate(boxSize, boxSize, 0);
   }
   
   /**
@@ -165,9 +125,6 @@ public class Minimap {
     return lerpColor(topColor, bottomColor, vertAmount);
   }
   
-  /**
-   * Dessine un cube représentant un mur
-   */
   private void drawCube() {
     beginShape(QUADS);
     
@@ -211,7 +168,7 @@ public class Minimap {
   }
   
   /**
-   * Dessine un sol (une face plane)
+   * Dessine un sol (face plane)
    */
   private void drawFloor() {
     beginShape(QUADS);
@@ -221,37 +178,55 @@ public class Minimap {
     vertex(0, boxSize, 0);
     endShape();
   }
+
+private void drawPlayer() {
+  pushMatrix();
+
+  // Positionner au centre de la case du joueur
+  translate(playerX * boxSize + boxSize / 2,
+            playerY * boxSize + boxSize / 2,
+            boxSize / 2);
+
+  float angle = 0; // vers le haut
   
-  /**
-   * Dessine la représentation du joueur
-   */
-  private void drawPlayer() {
-    pushMatrix();
-    
-    // Positionner au centre de la case du joueur
-    translate(playerX * boxSize + boxSize / 2, 
-              playerY * boxSize + boxSize / 2, 
-              boxSize / 2);
-    
-    // Effet de pulsation pour le joueur
-    float pulseSize = boxSize / 3 + sin(frameCount * 0.1) * boxSize / 20;
-    
-    // Apparence du joueur
-    fill(64, 224, 208, 200);  // Turquoise semi-transparent
-    emissive(20, 80, 80);     // Effet lumineux
-    noStroke();
-    sphere(pulseSize);
-    
-    // Réinitialiser les paramètres graphiques
-    emissive(0, 0, 0);
-    stroke(0);
-    
-    popMatrix();
+  if (dirX == 1) {
+    angle = -HALF_PI; // vers la droite
+  } else if (dirX == -1) {
+    angle = HALF_PI; // vers la gauche
+  } else if (dirY == -1) {
+    angle = PI; // vers le bas
   }
+
+  rotate(angle);
+
+  // Effet de pulsation pour la flèche : https://stackoverflow.com/questions/37691201/how-can-one-create-a-pulse-effect-in-processing
+  float pulseSize = boxSize / 3 + sin(frameCount * 0.1) * boxSize / 20;
+
+  // Dessiner la flèche
+  stroke(64, 224, 208);  // Couleur turquoise
+  strokeWeight(4);  // Épaisseur de la flèche
+  fill(64, 224, 208, 200);  // Remplissage semi-transparent
+
+  // Dessiner la pointe de la flèche
+  beginShape();
+  vertex(0, -pulseSize / 2); // Pointe de la flèche
+  vertex(-boxSize / 6, pulseSize / 2); // Côté gauche
+  vertex(boxSize / 6, pulseSize / 2); // Côté droit
+  endShape(CLOSE);
+
+  // Dessiner la tige de la flèche
+  rect(0, pulseSize / 2, boxSize / 8, pulseSize);
+
+  // Dessiner les plumes de la flèche
+  line(-boxSize / 10, pulseSize, 0, pulseSize + boxSize / 8);
+  line(boxSize / 10, pulseSize, 0, pulseSize + boxSize / 8);
+
+  popMatrix();
+}
+
+
+
   
-  /**
-   * Met à jour les zones découvertes autour du joueur
-   */
   public void updateDiscoveredArea() {
     // Parcourir la zone autour du joueur selon la distance visible
     for (int y = max(0, playerY - VIEW_DISTANCE); 
@@ -273,57 +248,24 @@ public class Minimap {
     }
   }
   
-  /**
-   * Gère les touches clavier pour contrôler la caméra de la minimap
-   * @param moved Si le joueur s'est déplacé
-   * @param positionX Nouvelle position X du joueur
-   * @param positionY Nouvelle position Y du joueur
-   */
-  public void performKeyPressed(boolean moved, int positionX, int positionY) {
-    // Contrôles de la caméra
-    if (key == 'a' || key == 'A') {
-      zoom *= 1.1;  // Zoom avant
-      System.out.println("zoom = " + zoom);
-    }
-    if (key == 'e' || key == 'E') {
-      zoom *= 0.9;  // Zoom arrière
-      System.out.println("zoom = " + zoom);
-    }
-    if (key == 'q' || key == 'Q') {
-      cameraRotY -= 0.1;  // Rotation gauche
-    }
-    if (key == 'd' || key == 'D') {
-      cameraRotY += 0.1;  // Rotation droite
-    }
-    if (key == 'z' || key == 'Z') {
-      cameraRotX -= 0.1;  // Rotation haut
-    }
-    if (key == 's' || key == 'S') {
-      cameraRotX += 0.1;  // Rotation bas
+  public void updatePlayerPosition(int positionX, int positionY) {
+    boolean update = false;
+    
+    if (this.playerX != positionX) {
+      this.playerX = positionX;
+      update = true;
     }
     
-    // Mettre à jour position du joueur et zone découverte si déplacement
-    if (moved) {
-      this.playerX = positionX;
+    if (this.playerY != positionY) {
       this.playerY = positionY;
+      update = true;
+    }
+    
+    if (update) {
       updateDiscoveredArea();
     }
   }
   
-  /**
-   * Met à jour la position du joueur (sans contrôle des touches)
-   * @param positionX Nouvelle position X
-   * @param positionY Nouvelle position Y
-   */
-  public void updatePlayerPosition(int positionX, int positionY) {
-    this.playerX = positionX;
-    this.playerY = positionY;
-    updateDiscoveredArea();
-  }
-  
-  /**
-   * Réinitialise les paramètres de la caméra
-   */
   public void resetCamera() {
     this.cameraRotX = 0;
     this.cameraRotY = 0;

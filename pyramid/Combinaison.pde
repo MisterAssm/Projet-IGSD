@@ -366,8 +366,7 @@ void gererTouchesLabyrinthe() {
       tournerJoueurDroite();
     }
     
-    minimap.performKeyPressed(true, posX, posY);
-    System.out.printf("(x,y) = (%d,%d)\n", posX, posY);
+    minimap.updatePlayerPosition(posX, posY);
   }
   
   minimap.updateDiscoveredArea();
