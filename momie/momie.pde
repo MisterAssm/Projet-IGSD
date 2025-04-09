@@ -25,7 +25,8 @@ void draw() {
   //directionalLight(204, 204, 204, -dirX, -dirY, -1);
 
   translate(width / 2, height / 2);
-  //rotateY(frameCount * 0.02);
+  rotateY(frameCount * 0.02);
+  //rotateY(2.3);
 
   shape(momie);
 }
@@ -162,7 +163,7 @@ PShape creerBrasMomie() {
         brasForme.endShape(CLOSE);
         brasForme.rotateZ(-direction * PI / 3); // Rotation de ±90 degrés autour de l'axe Z
         brasForme.rotateY(-direction * PI / 4);
-        brasForme.translate(direction * 80, -100, 0);
+        brasForme.translate(direction * 80, -100, 50);
         bras.addChild(brasForme);
     }
 
