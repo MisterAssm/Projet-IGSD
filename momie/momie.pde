@@ -1,9 +1,12 @@
 float da = PI / 50.; // angle pour la rotation
 PShape momie;
+PShape handModel;
 
 void setup() {
   size(500, 700, P3D);
   frameRate(20);
+  
+  handModel = loadShape("hand1.obj");
 
   momie = createShape(GROUP);
   PShape corps = creerCorpsMomie();
