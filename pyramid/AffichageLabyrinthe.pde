@@ -1,27 +1,29 @@
 class AffichageLabyrinthe {
   private final Labyrinthe labyrinthe;
+  int WALLD = 1; // Niveau de détail des murs
   
-  int WALLD = 1;  // Niveau de détail des murs
-  
-  PShape labyShape;        // Forme pour les murs
+  PShape labyShape;        // Forme groupe pour tous les murs
   PShape floorShape;       // Forme pour le sol
-  PShape ceilingShape;     // Forme pour les plafonds des corridors
+  PShape ceilingShape;     // Forme pour les plafonds
   PShape wallCeilingShape; // Forme pour les plafonds des murs
   PImage texture;          // Texture des murs
-  PImage textureSol;       // Texture du Sol 
+  PImage textureSol;       // Texture du sol
+  
+  // Nouveau: Map pour stocker les shapes individuelles des murs
+  private HashMap<String, PShape> wallShapesMap;
 
   public AffichageLabyrinthe(PImage texture, Labyrinthe labyrinthe, PImage textureSol) {
     this.texture = texture;
     this.labyrinthe = labyrinthe;
     this.textureSol = textureSol;
+    this.wallShapesMap = new HashMap<String, PShape>();
     createShapes();
   }
 
-private void createShapes() {
+  private void createShapes() {
     float wallW = width/labyrinthe.getSize();
     float wallH = height/labyrinthe.getSize();
 
-    // Réinitialiser toutes les shapes
     labyShape = createShape(GROUP);
     floorShape = createShape();
     ceilingShape = createShape();
@@ -32,41 +34,46 @@ private void createShapes() {
     floorShape.texture(textureSol);
     floorShape.noStroke();
     floorShape.textureMode(NORMAL);
-    floorShape.fill(255);
 
-    // Shape pour les plafonds
     ceilingShape.beginShape(QUADS);
     ceilingShape.noStroke();
     ceilingShape.fill(32);
 
-    // Shape pour les plafonds des murs
     wallCeilingShape.beginShape(QUADS);
     wallCeilingShape.noStroke();
     wallCeilingShape.fill(32, 255, 0);
 
-    // Parcours de la grille du labyrinthe
+    // Parcours de la grille
     for (int j = 0; j < labyrinthe.getSize(); j++) {
       for (int i = 0; i < labyrinthe.getSize(); i++) {
         if (labyrinthe.getLabyrinthe()[j][i] == '#') {
+          // Création de la shape pour ce mur spécifique
           PShape wall = createWallShape(i, j, wallW, wallH);
+          
+          // Stockage dans la map avec une clé unique
+          String key = i + "," + j;
+          wallShapesMap.put(key, wall);
+          
           labyShape.addChild(wall);
 
+          // Plafond pour ce mur
           wallCeilingShape.vertex(i*wallW-wallW/2, j*wallH-wallH/2, 50);
           wallCeilingShape.vertex(i*wallW+wallW/2, j*wallH-wallH/2, 50);
           wallCeilingShape.vertex(i*wallW+wallW/2, j*wallH+wallH/2, 50);
           wallCeilingShape.vertex(i*wallW-wallW/2, j*wallH+wallH/2, 50);
         } else {
-          // Nouvelle version corrigée pour le sol
-          float tileSize = 0.2f; // Ajustez cette valeur pour changer l'échelle de la texture
+          // Sol pour les cases vides
+          float tileSize = 0.2f;
           floorShape.vertex(i*wallW-wallW/2, j*wallH-wallH/2, -50, 
-                           i*tileSize, j*tileSize);
+                          i*tileSize, j*tileSize);
           floorShape.vertex(i*wallW+wallW/2, j*wallH-wallH/2, -50, 
-                           (i+1)*tileSize, j*tileSize);
+                          (i+1)*tileSize, j*tileSize);
           floorShape.vertex(i*wallW+wallW/2, j*wallH+wallH/2, -50, 
-                           (i+1)*tileSize, (j+1)*tileSize);
+                          (i+1)*tileSize, (j+1)*tileSize);
           floorShape.vertex(i*wallW-wallW/2, j*wallH+wallH/2, -50, 
-                           i*tileSize, (j+1)*tileSize);
+                          i*tileSize, (j+1)*tileSize);
 
+          // Plafond pour les cases vides
           ceilingShape.vertex(i*wallW-wallW/2, j*wallH-wallH/2, 50);
           ceilingShape.vertex(i*wallW+wallW/2, j*wallH-wallH/2, 50);
           ceilingShape.vertex(i*wallW+wallW/2, j*wallH+wallH/2, 50);
@@ -78,38 +85,44 @@ private void createShapes() {
     floorShape.endShape();
     ceilingShape.endShape();
     wallCeilingShape.endShape();
-}
+  }
 
-  private PShape createWallShape(int i, int j, float wallW, float wallH) {
+  
+    private PShape createWallShape(int i, int j, float wallW, float wallH) {
     PShape wall = createShape();
     wall.beginShape(QUADS);
     wall.texture(texture);
     wall.noStroke();
-    wall.fill(i*25, j*25, 255-i*10+j*10);
-
-    // Création des faces visibles seulement
+    
+    // Couleur basée sur la position
+    float r = map(j, 0, labyrinthe.getSize()-1, 0, 255);
+    float g = map(i, 0, labyrinthe.getSize()-1, 0, 255);
+    float b = abs(255 - r - g);
+    wall.fill(color(r, g, b));
+    wall.tint(color(r, g, b)); // Ajout important
+    
+    // Couleur de base (sera modifiée par le décorateur)
+    wall.fill(128); 
+    
+    // Création des faces
     if (j == 0 || labyrinthe.getLabyrinthe()[j-1][i] == ' ') {
-      wall.normal(0, -1, 0);
-      createWallFace(wall, i, j, wallW, wallH, 0);
+      createWallFace(wall, i, j, wallW, wallH, 0); // Face nord
     }
     if (j == labyrinthe.getSize()-1 || labyrinthe.getLabyrinthe()[j+1][i] == ' ') {
-      wall.normal(0, 1, 0);
-      createWallFace(wall, i, j, wallW, wallH, 1);
+      createWallFace(wall, i, j, wallW, wallH, 1); // Face sud
     }
     if (i == 0 || labyrinthe.getLabyrinthe()[j][i-1] == ' ') {
-      wall.normal(-1, 0, 0);
-      createWallFace(wall, i, j, wallW, wallH, 2);
+      createWallFace(wall, i, j, wallW, wallH, 2); // Face ouest
     }
     if (i == labyrinthe.getSize()-1 || labyrinthe.getLabyrinthe()[j][i+1] == ' ') {
-      wall.normal(1, 0, 0);
-      createWallFace(wall, i, j, wallW, wallH, 3);
+      createWallFace(wall, i, j, wallW, wallH, 3); // Face est
     }
 
     wall.endShape();
     return wall;
   }
 
-  private void createWallFace(PShape shape, int i, int j, float wallW, float wallH, int face) {
+private void createWallFace(PShape shape, int i, int j, float wallW, float wallH, int face) {
     for (int k = 0; k < WALLD; k++) {
       for (int l = -WALLD; l < WALLD; l++) {
         float bottomZ = (l+0)*50/WALLD;
@@ -155,9 +168,27 @@ private void createShapes() {
     }
   }
 
+ 
+
+  // Nouvelle méthode pour obtenir une shape de mur spécifique
+  public PShape getWallShape(int x, int y) {
+    String key = x + "," + y;
+    return wallShapesMap.get(key);
+  }
+
+  // Nouvelle méthode pour mettre à jour la couleur d'un mur
+public void setWallColor(int x, int y, color c) {
+    String key = x + "," + y;
+    PShape wall = wallShapesMap.get(key);
+    if (wall != null) {
+        wall.setFill(c);
+        wall.setTint(c); // Important pour que la couleur soit visible malgré la texture
+    }
+}
+
   public void display(boolean inLab) {
-    shape(floorShape, 0, 0);    // Dessine le sol en premier
-    shape(labyShape, 0, 0);     // Puis les murs
+    shape(floorShape, 0, 0);
+    shape(labyShape, 0, 0);
     
     if (inLab) {
       shape(ceilingShape, 0, 0);
@@ -165,21 +196,24 @@ private void createShapes() {
       shape(wallCeilingShape, 0, 0);
     }
   }
-
-  public void debugDraw() {
-    float wallW = width/labyrinthe.getSize();
-    float wallH = height/labyrinthe.getSize();
-    
+  
+  public void applyColorToWalls() {
     for (int j = 0; j < labyrinthe.getSize(); j++) {
-      for (int i = 0; i < labyrinthe.getSize(); i++) {
-        if (labyrinthe.getLabyrinthe()[j][i] == '#') {
-          fill(i*25, j*25, 255-i*10+j*10);
-          pushMatrix();
-          translate(50+i*wallW/8, 50+j*wallH/8, 50);
-          box(wallW/10, wallH/10, 5);
-          popMatrix();
+        for (int i = 0; i < labyrinthe.getSize(); i++) {
+            if (labyrinthe.getLabyrinthe()[j][i] == '#') {
+                // Calcul des composantes RGB basées sur la position
+                float r = map(j, 0, labyrinthe.getSize()-1, 0, 255);
+                float g = map(i, 0, labyrinthe.getSize()-1, 0, 255);
+                float b = abs(255 - r - g);
+                color wallColor = color(r, g, b);
+                
+                // Appliquer la couleur
+                setWallColor(i, j, wallColor);
+            }
         }
-      }
     }
-  }
 }
+
+}
+
+  

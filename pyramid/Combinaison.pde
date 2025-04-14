@@ -1,4 +1,4 @@
-/**
+ /**
  * Exploration de Pyramide - Labyrinthe 3D
  * Programme permettant d'explorer un environnement 3D composé d'une pyramide 
  * avec plusieurs étages de labyrinthes à l'intérieur.
@@ -6,6 +6,16 @@
 
 // ==================== VARIABLES GLOBALES ====================
 
+boolean showLevelComplete = false;
+int transitionAlpha = 0;
+int transitionDuration = 20; // Durée de la transition en frames
+String levelCompleteText = "Niveau terminé! Appuyez sur ENTRER pour continuer";
+int transitionStartTime = 0;
+
+boolean showMessage = false; // Pour afficher le message initial
+boolean showTransition = false; // Pour afficher la transition
+int messageStartTime = 10; // Pour le timer du message
+//=============================================================
 // === MODES D'AFFICHAGE ===
 boolean vuealternative = false;  // Vue extérieure (désert) ou intérieure (labyrinthe)
 boolean inLabyrinthe = false;    // Si le joueur est dans le labyrinthe de la pyramide
@@ -16,7 +26,7 @@ ArrayList<Labyrinthe> labyrinthes = new ArrayList<>();  // Différents étages d
 Labyrinthe lab;                  // Labyrinthe actuel
 Minimap minimap;                 // Carte du labyrinthe pour navigation
 int etageActuel = 0;             // Niveau actuel du labyrinthe
-int[] taillesEtages = {21, 15, 11, 9, 7};  // Tailles des labyrinthes par étage
+int[] taillesEtages = {21, 17, 15, 13, 11};  // Tailles des labyrinthes par étage
 
 // === PYRAMIDES ===
 Pyramide pyramidePrincipale;     // Pyramide principale
@@ -64,7 +74,7 @@ void setup() {
   
   // Chargement des textures
   chargerTextures();
-  
+
   // Paramètres pour les pyramides
   int tailleBase = 21;
   int nbEtages = 9;
@@ -80,6 +90,10 @@ void setup() {
   // Sélection du premier labyrinthe
   lab = labyrinthes.get(0);
   
+  // Initialisation du décorateur de couleurs
+  ColorWallDecorator colorDecorator = new ColorWallDecorator(lab, lab.getAffichage());
+  colorDecorator.applyWallColors();
+  
   // Création des pyramides
   pyramidePrincipale = new Pyramide(tailleBase, nbEtages, tailleCellule, hauteurNiveau, texturePierre, textureSommet, texturePorte);
   pyramideSecondaire1 = new Pyramide(21, 9, 40, 60, texturePierre, textureSommet, texturePorte);
@@ -94,6 +108,8 @@ void setup() {
 void draw() {
   if (inLabyrinthe) {
     dessinerLabyrinthe();
+    drawMessage(); // Affiche d'abord le message
+    drawTransition(); // Puis la transition si elle est activée
   } else {
     if (vuealternative) {
       dessinerVueExterieure();
@@ -120,9 +136,15 @@ void chargerTextures() {
  * Crée les différents labyrinthes pour chaque étage
  */
 void creerLabyrinthes() {
-  for (int taille : taillesEtages) {
-    labyrinthes.add(new Labyrinthe(taille, textureMur, textureSol)); 
-  }
+    for (int taille : taillesEtages) {
+        Labyrinthe labyrinthe = new Labyrinthe(taille, textureMur, textureSol);
+        
+        // Appliquer les couleurs aux murs
+        AffichageLabyrinthe affichage = labyrinthe.getAffichage();
+        affichage.applyColorToWalls();
+        
+        labyrinthes.add(labyrinthe);
+    }
 }
 
 // ==================== FONCTIONS DE RENDU ====================
@@ -167,6 +189,7 @@ void dessinerVuePyramide() {
   pyramidePrincipale.dessiner(scalePorte);
   popMatrix();
 }
+//=========================================================================
 
 /**
  * Dessine l'intérieur du labyrinthe avec caméra subjective
@@ -188,6 +211,8 @@ void dessinerLabyrinthe() {
   
   // Afficher la minimap en haut à gauche
   minimap.drawMinimap();
+
+
   
   // Vérifier si le joueur a atteint la sortie
   verifierSortieEtage();
@@ -280,13 +305,9 @@ void verifierEntreePyramide() {
  */
 void verifierSortieEtage() {
   if (posX == lab.getSize()-1 && posY == lab.getSize()-2) {
-    etageActuel++;
-    if (etageActuel < labyrinthes.size()) {
-      // Passer à l'étage suivant
-      passerEtageSuivant();
-    } else {
-      // Sortir de la pyramide
-      inLabyrinthe = false;
+    if (!showMessage && !showTransition) {
+      showMessage = true;
+      messageStartTime = millis();
     }
   }
 }
@@ -295,8 +316,17 @@ void verifierSortieEtage() {
  * Passe au niveau suivant du labyrinthe
  */
 void passerEtageSuivant() {
+  
+ 
+
   lab = labyrinthes.get(etageActuel);
   minimap = new Minimap(lab);
+  
+  
+    
+  // Appliquer les couleurs au nouveau niveau
+  ColorWallDecorator colorDecorator = new ColorWallDecorator(lab, lab.getAffichage());
+  colorDecorator.applyWallColors();
   
   // Réinitialiser la position et la direction du joueur
   posX = 1; 
@@ -341,7 +371,11 @@ void drawDesert(float size, int resolution, float scale, float height) {
 
 void keyPressed() {
   if (inLabyrinthe) {
-    gererTouchesLabyrinthe();
+    if (showMessage && keyCode == 32) {
+      startTransition();
+    } else if (!showMessage && !showTransition) {
+      gererTouchesLabyrinthe();
+    }
   } else {
     gererTouchesExterieur();
   }
@@ -430,4 +464,129 @@ void tournerJoueurDroite() {
   int tmp = dirX; 
   dirX = -dirY; 
   dirY = tmp;
+}
+
+
+void drawTransitionEffect() {
+if (!showTransition) return;
+  
+  loadPixels();
+  float center = width/((transitionAlpha % 10) + 1);
+  float r = 0.5, g = 0.3, b = 0.1; // Couleur ambre/or
+  
+  for (int i = 0; i < width; ++i) {
+    for (int j = 0; j < height; ++j) {
+      float re = (255 - (1 - r) * abs(center - dist(width/2., height/2., i, j)) / 2.) % 256;
+      float gr = (255 - (1 - g) * abs(center - dist(width/2., height/2., i, j)) / 2.) % 256;
+      float bl = (255 - (1 - b) * abs(center - dist(width/2., height/2., i, j)) / 2.) % 256;
+      color pxl_color = color(re, gr, bl, transitionAlpha);
+      pixels[j * width + i] = pxl_color;
+    }
+  }
+  updatePixels();
+  
+  // Superposer le texte
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  fill(255, transitionAlpha);
+  text(levelCompleteText, width/2, height/2);
+  
+  if (transitionAlpha < 255) {
+    transitionAlpha += 5;
+  }
+}
+void drawTransition() {
+  if (!showTransition) return;
+  
+  drawTransitionEffect();
+  
+  // La transition dure 3 secondes
+  if (millis() - transitionStartTime > 3000) {
+    passerAuNiveauSuivant();
+  }
+}
+void passerAuNiveauSuivant() {
+  etageActuel++;
+  if (etageActuel < labyrinthes.size()) {
+    passerEtageSuivant();
+  } else {
+    inLabyrinthe = false;
+  }
+ showTransition = false;
+}
+
+void drawMessage() {
+  if (!showMessage) return;
+  
+  pushMatrix();
+  pushStyle();
+  
+  // Configuration de base
+  camera();
+  hint(DISABLE_DEPTH_TEST);
+  noLights();
+  ortho();
+  
+  // Fond avec dégradé moderne
+  rectMode(CORNER);
+  for (int i = 0; i < height; i++) {
+    float inter = map(i, 0, height, 0, 1);
+    fill(lerpColor(color(20, 30, 50, 200), color(10, 15, 25, 220), inter));
+    noStroke();
+    rect(0, i, width, 1);
+  }
+  
+  // Cadre stylisé
+  fill(255, 255, 255, 30);
+  stroke(150, 180, 255, 150);
+  strokeWeight(3);
+  rect(width/2 - 310, height/2 - 70, 620, 140, 15);
+  
+  // Style du texte
+  textAlign(CENTER, CENTER);
+  
+  // Titre principal - Effet néon bleu
+  textSize(42);
+  fill(#4DF2FF); // Bleu cyan vif
+  text("Niveau Terminé", width/2, height/2 - 25);
+  
+  // Animation de lueur pour le titre
+  
+  fill(#4DF2FF, 50);
+  for (int i = 0; i < 3; i++) {
+    text("Niveau Terminé", width/2, height/2 - 25);
+  }
+  
+  // Texte d'instruction - Dégradé violet/orange
+  textSize(28);
+  fill(255);
+  text("Appuyez sur", width/2 - 80, height/2 + 25);
+  
+  // Bouton ENTRER stylisé
+  float pulse = sin(frameCount * 0.15) * 5 + 5;
+  textSize(30 + pulse);
+  fill(#FF6EC7); // Rose fluo
+  text("ESPACE", width/2 + 70, height/2 + 25);
+  
+  // Contour pulsant du bouton
+  noFill();
+  stroke(#FF6EC7, 150);
+  strokeWeight(1 + pulse/10);
+  rect(width/2 + 15, height/2 + 5, 120, 30, 5);
+  
+  hint(ENABLE_DEPTH_TEST);
+  popStyle();
+  popMatrix();
+  
+  // Transition automatique après délai
+  if (millis() - messageStartTime > 20000) {
+    startTransition();
+  }
+}
+void startTransition() {
+  transitionAlpha = 0;
+  showMessage = false;
+  showTransition = true;
+  transitionAlpha = 0;
+  transitionStartTime = millis();
 }
