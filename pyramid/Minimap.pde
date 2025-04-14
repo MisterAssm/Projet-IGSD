@@ -11,7 +11,14 @@ public class Minimap {
   private int playerX;
   private int playerY;
   
-  public Minimap(Labyrinthe labyrinthe) {
+  // Direction du joueur (pour l'orientation de la flèche)
+  private int dirX;
+  private int dirY;
+  
+  // Liste des momies à afficher
+  private ArrayList<Momie> momies;
+  
+  public Minimap(Labyrinthe labyrinthe, ArrayList<Momie> momies) {
     this.labyrinthe = labyrinthe;
     this.shader = loadShader("assets/shaders/LabyColor.glsl", "assets/shaders/LabyTexture.glsl");
     this.boxSize = (width / labyrinthe.getSize()) - 5;
@@ -22,6 +29,11 @@ public class Minimap {
     // Position initiale du joueur
     this.playerX = 1;
     this.playerY = 0;
+    
+    this.dirX = 0;
+    this.dirY = 1;
+    
+    this.momies = momies;
     
     // Marquer la zone initiale comme découverte
     updateDiscoveredArea();
@@ -48,11 +60,89 @@ public class Minimap {
     // Dessiner le labyrinthe et le joueur
     drawLabyrinth();
     drawPlayer();
+    
+    // Dessiner les momies
+    drawMomies();
   
     popMatrix();
     resetShader();
     popMatrix();
   
+    popMatrix();
+  }
+  
+  /**
+   * Définit la liste des momies à afficher sur la minimap
+   */
+  public void setMomies(ArrayList<Momie> momies) {
+    this.momies = momies;
+  }
+  
+  /**
+   * Dessine toutes les momies sur la minimap
+   */
+  private void drawMomies() {
+    if (momies == null || momies.isEmpty()) {
+      return;
+    }
+    
+    for (Momie momie : momies) {
+      // Obtenir les coordonnées de la momie
+      float momieX = momie.getX();
+      float momieY = momie.getY();
+      
+      // Vérifier si la position de la momie est découverte
+      int gridX = (int)momieX;
+      int gridY = (int)momieY;
+      
+      if (gridX >= 0 && gridX < labyrinthe.getSize() && 
+          gridY >= 0 && gridY < labyrinthe.getSize() &&
+          discovered[gridY][gridX]) {
+        
+        // Direction de la momie pour l'orientation
+        float momieRotation = momie.getCurrentRotation();
+        
+        // Dessiner la momie
+        drawMomie(momieX, momieY, momieRotation);
+      }
+    }
+  }
+  
+  /**
+   * Dessine une momie à la position spécifiée
+   */
+  private void drawMomie(float x, float y, float rotation) {
+    pushMatrix();
+    
+    // Positionner au centre de la case de la momie
+    translate(x * boxSize + boxSize / 2,
+              y * boxSize + boxSize / 2,
+              boxSize / 2);
+    
+    // Appliquer la rotation de la momie
+    rotate(rotation);
+    
+    // Couleur jaune pour la momie
+    stroke(255, 255, 0);  // Contour jaune
+    strokeWeight(3);      // Épaisseur du contour
+    fill(255, 255, 0, 200); // Jaune semi-transparent
+    
+    // Dessiner la momie comme un petit triangle orienté
+    float momieSize = boxSize / 4;
+    
+    beginShape();
+    vertex(0, -momieSize); // Pointe avant
+    vertex(-momieSize, momieSize); // Coin arrière gauche
+    vertex(momieSize, momieSize); // Coin arrière droit
+    endShape(CLOSE);
+    
+    // Bandages - lignes horizontales pour symboliser une momie
+    stroke(255, 255, 150);
+    strokeWeight(1);
+    line(-momieSize/2, -momieSize/2, momieSize/2, -momieSize/2);
+    line(-momieSize/2, 0, momieSize/2, 0);
+    line(-momieSize/2, momieSize/2, momieSize/2, momieSize/2);
+    
     popMatrix();
   }
   
@@ -169,53 +259,53 @@ public class Minimap {
     endShape();
   }
 
-private void drawPlayer() {
-  pushMatrix();
+  private void drawPlayer() {
+    pushMatrix();
 
-  // Positionner au centre de la case du joueur
-  translate(playerX * boxSize + boxSize / 2,
-            playerY * boxSize + boxSize / 2,
-            boxSize / 2);
+    // Positionner au centre de la case du joueur
+    translate(playerX * boxSize + boxSize / 2,
+              playerY * boxSize + boxSize / 2,
+              boxSize / 2);
 
-  float angle = 0; // vers le haut
-  
-  if (dirX == 1) {
-    angle = -HALF_PI; // vers la droite
-  } else if (dirX == -1) {
-    angle = HALF_PI; // vers la gauche
-  } else if (dirY == -1) {
-    angle = PI; // vers le bas
+    // Déterminer l'angle de rotation en fonction de la direction
+    float angle = 0; // Par défaut vers le haut
+    
+    if (dirX == 1 && dirY == 0) {
+        angle = HALF_PI; // vers la droite
+    } else if (dirX == -1 && dirY == 0) {
+        angle = -HALF_PI; // vers la gauche
+    } else if (dirX == 0 && dirY == 1) {
+        angle = PI; // vers le bas
+    } else if (dirX == 0 && dirY == -1) {
+        angle = 0; // vers le haut
+    }
+
+    rotate(angle);
+
+    // Effet de pulsation pour la flèche
+    float pulseSize = boxSize / 3 + sin(frameCount * 0.1) * boxSize / 20;
+
+    // Dessiner la flèche
+    stroke(64, 224, 208);  // Couleur turquoise
+    strokeWeight(4);  // Épaisseur de la flèche
+    fill(64, 224, 208, 200);  // Remplissage semi-transparent
+
+    // Dessiner la pointe de la flèche
+    beginShape();
+    vertex(0, -pulseSize / 2); // Pointe de la flèche
+    vertex(-boxSize / 6, pulseSize / 2); // Côté gauche
+    vertex(boxSize / 6, pulseSize / 2); // Côté droit
+    endShape(CLOSE);
+
+    // Dessiner la tige de la flèche
+    rect(-boxSize/16, pulseSize / 2, boxSize / 8, pulseSize);
+
+    // Dessiner les plumes de la flèche
+    line(-boxSize / 10, pulseSize, 0, pulseSize + boxSize / 8);
+    line(boxSize / 10, pulseSize, 0, pulseSize + boxSize / 8);
+
+    popMatrix();
   }
-
-  rotate(angle);
-
-  // Effet de pulsation pour la flèche : https://stackoverflow.com/questions/37691201/how-can-one-create-a-pulse-effect-in-processing
-  float pulseSize = boxSize / 3 + sin(frameCount * 0.1) * boxSize / 20;
-
-  // Dessiner la flèche
-  stroke(64, 224, 208);  // Couleur turquoise
-  strokeWeight(4);  // Épaisseur de la flèche
-  fill(64, 224, 208, 200);  // Remplissage semi-transparent
-
-  // Dessiner la pointe de la flèche
-  beginShape();
-  vertex(0, -pulseSize / 2); // Pointe de la flèche
-  vertex(-boxSize / 6, pulseSize / 2); // Côté gauche
-  vertex(boxSize / 6, pulseSize / 2); // Côté droit
-  endShape(CLOSE);
-
-  // Dessiner la tige de la flèche
-  rect(0, pulseSize / 2, boxSize / 8, pulseSize);
-
-  // Dessiner les plumes de la flèche
-  line(-boxSize / 10, pulseSize, 0, pulseSize + boxSize / 8);
-  line(boxSize / 10, pulseSize, 0, pulseSize + boxSize / 8);
-
-  popMatrix();
-}
-
-
-
   
   public void updateDiscoveredArea() {
     // Parcourir la zone autour du joueur selon la distance visible
@@ -238,21 +328,25 @@ private void drawPlayer() {
     }
   }
   
-  public void updatePlayerPosition(int positionX, int positionY) {
-    boolean update = false;
-    
-    if (this.playerX != positionX) {
-      this.playerX = positionX;
-      update = true;
-    }
-    
-    if (this.playerY != positionY) {
-      this.playerY = positionY;
-      update = true;
-    }
-    
-    if (update) {
-      updateDiscoveredArea();
-    }
+  public void updatePlayerPosition(int positionX, int positionY, int directionX, int directionY) {
+      boolean update = false;
+      
+      if (this.playerX != positionX) {
+          this.playerX = positionX;
+          update = true;
+      }
+      
+      if (this.playerY != positionY) {
+          this.playerY = positionY;
+          update = true;
+      }
+      
+      // Mise à jour de la direction du joueur
+      this.dirX = directionX;
+      this.dirY = directionY;
+      
+      if (update) {
+          updateDiscoveredArea();
+      }
   }
 }

@@ -27,7 +27,7 @@ Labyrinthe lab;                  // Labyrinthe actuel
 Minimap minimap;                 // Carte du labyrinthe pour navigation
 int etageActuel = 0;             // Niveau actuel du labyrinthe
 int[] taillesEtages = {21, 17, 15, 13, 11};  // Tailles des labyrinthes par étage
-Momie momie;
+ArrayList<Momie> momies;
 
 // === PYRAMIDES ===
 Pyramide pyramidePrincipale;     // Pyramide principale
@@ -97,9 +97,12 @@ void setup() {
   pyramideSecondaire1 = new Pyramide(21, 9, 40, 60, texturePierre, textureSommet, texturePorte);
   pyramideSecondaire2 = new Pyramide(25, 10, 40, 60, texturePierre, textureSommet, texturePorte);
   
+  this.momies = new ArrayList<Momie>();
+  
+  this.momies.add(new Momie(1, 1));
+  
   // Création de la minimap
-  this.minimap = new Minimap(lab);
-  this.momie = new Momie(1, 1);
+  this.minimap = new Minimap(lab, momies);
 }
 
 // ==================== FONCTIONS PRINCIPALES ====================
@@ -207,7 +210,10 @@ void dessinerLabyrinthe() {
   // Dessiner les murs du labyrinthe
   noStroke();
   lab.getAffichage().display(inLab);
-  momie.drawMomie();
+  
+  for (Momie momie : momies) {
+    momie.drawMomie();
+  }
   
   // Afficher la minimap en haut à gauche
   minimap.drawMinimap();
@@ -316,9 +322,11 @@ void verifierSortieEtage() {
 void passerEtageSuivant() {
   
   this.lab = labyrinthes.get(etageActuel);
-  this.minimap = new Minimap(lab);
-  this.momie = new Momie(1, 1);
-
+  
+  this.momies.clear();
+  this.momies.add(new Momie(1, 1));
+  
+  this.minimap = new Minimap(lab, momies);
   
   // Réinitialiser la position et la direction du joueur
   posX = 1; 
@@ -388,7 +396,7 @@ void gererTouchesLabyrinthe() {
       tournerJoueurDroite();
     }
     
-    minimap.updatePlayerPosition(posX, posY);
+    minimap.updatePlayerPosition(posX, posY, dirX, dirY);
   }
   
   minimap.updateDiscoveredArea();

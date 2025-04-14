@@ -551,4 +551,25 @@ class Momie {
   
     return bras;
   }
+  
+  /**
+   * Retourne la position X actuelle de la momie
+   */
+  public float getX() {
+    return this.x;
+  }
+  
+  /**
+   * Retourne la position Y actuelle de la momie
+   */
+  public float getY() {
+    return this.y;
+  }
+  
+  /**
+   * Retourne la rotation actuelle de la momie
+   */
+  public float getCurrentRotation() {
+    return this.currentRotation;
+  }
 }
