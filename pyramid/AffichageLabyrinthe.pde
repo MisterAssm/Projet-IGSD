@@ -9,7 +9,7 @@ class AffichageLabyrinthe {
   PImage texture;          // Texture des murs
   PImage textureSol;       // Texture du sol
   
-  // Nouveau: Map pour stocker les shapes individuelles des murs
+  //  Map pour stocker les shapes individuelles des murs
   private HashMap<String, PShape> wallShapesMap;
 
   public AffichageLabyrinthe(PImage texture, Labyrinthe labyrinthe, PImage textureSol) {
@@ -99,9 +99,9 @@ class AffichageLabyrinthe {
     float g = map(i, 0, labyrinthe.getSize()-1, 0, 255);
     float b = abs(255 - r - g);
     wall.fill(color(r, g, b));
-    wall.tint(color(r, g, b)); // Ajout important
+    wall.tint(color(r, g, b)); 
     
-    // Couleur de base (sera modifiée par le décorateur)
+    
     wall.fill(128); 
     
     // Création des faces
@@ -170,19 +170,19 @@ private void createWallFace(PShape shape, int i, int j, float wallW, float wallH
 
  
 
-  // Nouvelle méthode pour obtenir une shape de mur spécifique
+  //  pour obtenir une shape de mur spécifique
   public PShape getWallShape(int x, int y) {
     String key = x + "," + y;
     return wallShapesMap.get(key);
   }
 
-  // Nouvelle méthode pour mettre à jour la couleur d'un mur
+ //  méthode pour mettre à jour la couleur d'un mur
 public void setWallColor(int x, int y, color c) {
     String key = x + "," + y;
     PShape wall = wallShapesMap.get(key);
     if (wall != null) {
         wall.setFill(c);
-        wall.setTint(c); // Important pour que la couleur soit visible malgré la texture
+        wall.setTint(c);  // la couleur soit visible malgré la texture
     }
 }
 

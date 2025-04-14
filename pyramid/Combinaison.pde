@@ -90,9 +90,7 @@ void setup() {
   // Sélection du premier labyrinthe
   lab = labyrinthes.get(0);
   
-  // Initialisation du décorateur de couleurs
-  ColorWallDecorator colorDecorator = new ColorWallDecorator(lab, lab.getAffichage());
-  colorDecorator.applyWallColors();
+
   
   // Création des pyramides
   pyramidePrincipale = new Pyramide(tailleBase, nbEtages, tailleCellule, hauteurNiveau, texturePierre, textureSommet, texturePorte);
@@ -101,6 +99,8 @@ void setup() {
   
   // Création de la minimap
   this.minimap = new Minimap(lab);
+  
+  
 }
 
 // ==================== FONCTIONS PRINCIPALES ====================
@@ -317,16 +317,9 @@ void verifierSortieEtage() {
  */
 void passerEtageSuivant() {
   
- 
-
   lab = labyrinthes.get(etageActuel);
   minimap = new Minimap(lab);
-  
-  
-    
-  // Appliquer les couleurs au nouveau niveau
-  ColorWallDecorator colorDecorator = new ColorWallDecorator(lab, lab.getAffichage());
-  colorDecorator.applyWallColors();
+
   
   // Réinitialiser la position et la direction du joueur
   posX = 1; 

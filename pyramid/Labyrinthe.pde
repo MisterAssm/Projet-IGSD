@@ -23,14 +23,7 @@ class Labyrinthe {
     return labyrinthe[y][x] == '#';
   }
   
- public void afficherLabyrinthe() {
-  for (int j = 0; j < size; j++) {
-    for (int i = 0; i < size; i++) {
-      print(labyrinthe[j][i]);
-    }
-    println("");
-  }
-}
+
   
   public char[][] getLabyrinthe() {
     return labyrinthe;
@@ -55,7 +48,7 @@ class GenerateurLabyrinthe {
   void genererLabyrinthe(char[][] labyrinthe, char[][][] cotes) {
     int taille = labyrinthe.length;
     int aCreuser = 0;
-    
+      
     initialiserLabyrinthe(labyrinthe, cotes, taille);
     aCreuser = compterZonesACreuser(labyrinthe, taille);
     creuserLabyrinthe(labyrinthe, taille, aCreuser);

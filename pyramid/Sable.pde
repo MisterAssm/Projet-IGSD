@@ -1,87 +1,64 @@
-class Sable{
+
+/*===========================================================================================*/
+ /* Classe Sable : génère un sol en forme de dune de sable à l’aide d’un shader et du bruit*/
+/*===========================================================================================*/
+
+class Sable {
   
-  PShader shader;
-  
-   int tailleGrille ; // le nombre de points 
-   float distance ; // la distance entre les points 
-   float  amplitude; //  la taille de la hauteur de chaque point
-   float facteurBruit ; //  la densité  des variations de la hauteur 
-   
-   Sable(int tailleGrille, float distance, float amplitude,float facteurBruit){
-      this.tailleGrille=tailleGrille;
-      this.distance=distance;
-      this.amplitude=amplitude;
-      this.facteurBruit=facteurBruit;
-      
-      shader = loadShader("assets/shaders/sable_frag.glsl");
-      shader.set("lightDir", 0.5, 1.0, -0.8); 
-   }
-   
-    void dessinerSable() {
-      //appliquer le shader 
-      shader(shader);
-      background(190, 170, 255);
-      noStroke();
-      pushMatrix();
-      
-      // deplacer  le systeme de coords au milieu 
-      translate(width / 2 - tailleGrille * distance / 2, height / 2 + 20, -200);
-       
-      for(int i=0;i<tailleGrille;i++) {
-        beginShape(QUAD_STRIP);
-        
-        for (int j = 0; j <tailleGrille; j++) {
-           // position d un point de la grille 
-            float x1 = i*distance; 
-            float y1 = j* distance;
-            
-              // la hauteur du point courant 
-              float h1 = noise(i / facteurBruit, j / facteurBruit) * amplitude;
-              //hauteur du point juste a droite 
-              float h2 = noise((i + 1) / facteurBruit, j / facteurBruit) * amplitude;
-             
-             vertex(x1, h1, y1);
-             vertex(x1 +distance, h2, y1);
-          }
-          
-          endShape();
-     }
-     
-     popMatrix(); 
-     resetShader();
-     
-   }
-   
-  void dessinerDessert(float size, int resolution, float scale) {
-     
-      noStroke();
-      textureMode(NORMAL);
-      fill(255, 140, 0); // Couleur sable du désert
-      
-      for (int z = 0; z < resolution; z++) {
-          beginShape(TRIANGLE_STRIP);
-          for (int x = 0; x <= resolution; x++) {
-              float xPos = map(x, 0, resolution, -size/2, size/2);
-              float zPos = map(z, 0, resolution, -size/2, size/2);
-              float zPos2 = map(z+1, 0, resolution, -size/2, size/2);
-  
-              // Utilisation des paramètres de la classe pour le bruit
-              float h1 = noise(xPos*scale/facteurBruit, zPos*scale/facteurBruit) * amplitude;
-              float h2 = noise(xPos*scale/facteurBruit, zPos2*scale/facteurBruit) * amplitude;
-  
-              // Mise à jour du shader
-              float avgHeight = (h1 + h2) * 0.5;
-              shader.set("height", avgHeight);
-              
-              vertex(xPos, h1, zPos);
-              vertex(xPos, h2, zPos2);
-          }
-          endShape();
+  PShader shader; // Shader pour appliquer des effets visuels (lumièr)
+
+  int tailleGrille;        // Le nombre de points dans chaque dimension (grille carrée)
+  float distance;          // Distance entre chaque point de la grille
+  float amplitude;         // Hauteur maximale des vagues (relief)
+  float facteurBruit;      // Fréquence du bruit (plus petit = plus détaillé)
+
+  // Constructeur : initialise les paramètres du sable
+  Sable(int tailleGrille, float distance, float amplitude, float facteurBruit) {
+    this.tailleGrille = tailleGrille;
+    this.distance = distance;
+    this.amplitude = amplitude;
+    this.facteurBruit = facteurBruit;
+
+    // Chargement du shader depuis le fichier
+    shader = loadShader("assets/shaders/sable_frag.glsl");
+    
+    // Direction de la lumière utilisée dans le shader
+    shader.set("lightDir", 0.5, 1.0, -0.8); 
+  }
+
+  // Fonction pour dessiner le sable à l'écran
+  void dessinerSable() {
+    shader(shader); // Activation du shader
+    background(190, 170, 255); // Couleur de fond
+    noStroke(); // Pas de bordures visibles pour les formes
+
+    pushMatrix(); // Sauvegarde de la matrice de transformation
+
+    // Centre la grille sur l'écran, légèrement en bas et vers l'arrière
+    translate(width / 2 - tailleGrille * distance / 2, height / 2 + 20, -200);
+
+    // Parcours de la grille pour créer les bandes horizontales
+    for (int i = 0; i < tailleGrille; i++) {
+      beginShape(QUAD_STRIP); // pour dessiner une bande de quadrilatères
+
+      for (int j = 0; j < tailleGrille; j++) {
+        // Coordonnées X et Y du point courant
+        float x1 = i * distance;
+        float y1 = j * distance;
+
+        // Calcul des hauteurs en utilisant du bruit de Perlin
+        float h1 = noise(i / facteurBruit, j / facteurBruit) * amplitude;         // Point courant
+        float h2 = noise((i + 1) / facteurBruit, j / facteurBruit) * amplitude;   // Point à droite
+
+        // Ajout des deux points à la forme (deux sommets pour faire une bande)
+        vertex(x1, h1, y1);                   // Premier point
+        vertex(x1 + distance, h2, y1);        // Deuxième point (à droite)
       }
-     
-  }   
- 
+
+      endShape(); // Fin de la bande
+    }
+
+    popMatrix(); // Restauration de la matrice
+    resetShader(); // Désactivation du shader
+  }
 }
- 
- 
- 
