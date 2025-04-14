@@ -99,6 +99,7 @@ void setup() {
   this.momies = new ArrayList<Momie>();
   
   this.momies.add(new Momie(1, 1));
+  this.momies.add(new Momie(lab.getEmptyCell(1, 1)));
   
   // Création de la minimap
   this.minimap = new Minimap(lab, momies);
@@ -327,6 +328,7 @@ void passerEtageSuivant() {
   
   this.momies.clear();
   this.momies.add(new Momie(1, 1));
+  this.momies.add(new Momie(lab.getEmptyCell(1, 1)));
   
   this.minimap = new Minimap(lab, momies);
   

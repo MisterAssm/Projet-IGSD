@@ -41,6 +41,38 @@ class Labyrinthe {
     return affichageLabyrinthe;
   }
   
+  public PVector getEmptyCell(int currX, int currY) {
+    int x, y;
+    int attempts = 0;
+    int maxAttempts = 100; // Éviter une boucle infinie
+    
+    do {
+        x = int(random(getSize()));
+        y = int(random(getSize()));
+        attempts++;
+        
+        // Si on atteint le nombre maximum de tentatives, on utilise une case libre à proximité
+        if (attempts >= maxAttempts) {
+            return getNearbyEmptyCell(int(x), int(y));
+        }
+    } while (lab.isWall(x, y) || (x == int(currX) && y == int(currY)));
+    
+    return new PVector(x, y);
+  }
+
+  public PVector getNearbyEmptyCell(int currentX, int currentY) {
+      int[][] directions = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
+      for (int[] dir : directions) {
+          int newX = currentX + dir[0];
+          int newY = currentY + dir[1];
+          if (!lab.isWall(newX, newY)) {  // Parenthèse fermante ajoutée ici
+              return new PVector(newX, newY);
+          }
+      }
+      // Si aucune case libre n'est trouvée, retourne la position actuelle (solution de repli)
+      return new PVector(currentX, currentY);
+  }
+  
 }
 
 class GenerateurLabyrinthe {

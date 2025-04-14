@@ -46,8 +46,8 @@ public class Minimap {
     camera();
     ortho();
   
-    int offsetX = 20; // Marge depuis le bord gauche
-    int offsetY = 20; // Marge depuis le bord supérieur
+    int offsetX = 20; 
+    int offsetY = 20;
   
     pushMatrix();
     setupLighting();

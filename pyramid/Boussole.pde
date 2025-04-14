@@ -46,7 +46,6 @@ class Compass {
     cardinalTexts = createGraphics(size, size);
     cardinalTexts.beginDraw();
     cardinalTexts.clear();
-    cardinalTexts.textMode(SHAPE);
     cardinalTexts.textSize(28 * scaleFactor);
     cardinalTexts.textAlign(CENTER, CENTER);
     

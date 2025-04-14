@@ -3,17 +3,17 @@ class Momie {
   private float da = PI / 50.; // angle pour la rotation
 
   private PShape momie;
-  private float x, y; // Utiliser des floats pour permettre des positions intermédiaires
-  private float targetX, targetY; // Position cible pour l'animation
-  private float previousX, previousY; // Pour stocker la position précédente
-  private float currentRotation; // Rotation actuelle de la momie (en radians)
-  private float targetRotation; // Rotation cible (en radians)
+  private float x, y; 
+  private float targetX, targetY;
+  private float previousX, previousY; 
+  private float currentRotation; 
+  private float targetRotation; 
   private int direction; // 0: Haut, 1: Droite, 2: Bas, 3: Gauche
-  private float animationProgress; // Progression de l'animation
+  private float animationProgress; 
   private float animationDuration = 2.0; // Durée de l'animation en secondes
   private float rotationDuration = 0.8; // Durée de la rotation en secondes
-  private boolean isRotating; // Indique si la momie est en train de tourner
-  private boolean isMoving; // Indique si la momie est en train de se déplacer
+  private boolean isRotating; 
+  private boolean isMoving; 
   
   // Variables pour l'algorithme A*
   private ArrayList<PVector> path; // Chemin calculé par A*
@@ -34,14 +34,15 @@ class Momie {
     this.targetY = y;
     this.previousX = x;
     this.previousY = y;
+    this.renderX = x;
+    this.renderY = y;
+    
     this.direction = int(random(4)); // Initialiser avec une direction aléatoire
     this.currentRotation = direction * PI / 2;
     this.targetRotation = currentRotation;
     this.animationProgress = 0;
     this.isRotating = false;
     this.isMoving = false;
-    this.renderX = x;
-    this.renderY = y;
     this.renderRotation = currentRotation;
     
     this.path = new ArrayList<PVector>();
@@ -50,6 +51,10 @@ class Momie {
     
     // Définir une première destination aléatoire
     selectNewDestination();
+  }
+  
+  public Momie(PVector vector) {
+    this(int(vector.x), int(vector.y));
   }
   
   private void initMomie() {
@@ -163,37 +168,11 @@ class Momie {
     isMoving = true;
     animationProgress = 0;
   }
-
-  // Sélectionner une nouvelle destination aléatoire valide dans le labyrinthe
+  
   private void selectNewDestination() {
-    int labSize = lab.getSize();
-    int destX, destY;
-    int attempts = 0;
-    int maxAttempts = 100; // Éviter une boucle infinie
-    
-    do {
-      destX = int(random(labSize));
-      destY = int(random(labSize));
-      attempts++;
-      
-      // Si on atteint le nombre maximum de tentatives, on utilise une case libre à proximité
-      if (attempts >= maxAttempts) {
-        int[][] directions = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
-        for (int[] dir : directions) {
-          int newX = int(x) + dir[0];
-          int newY = int(y) + dir[1];
-          if (!lab.isWall(newX, newY) && (newX != int(x) || newY != int(y))) {
-            destX = newX;
-            destY = newY;
-            break;
-          }
-        }
-        break;
-      }
-    } while (lab.isWall(destX, destY) || (destX == int(x) && destY == int(y)));
-    
-    destination = new PVector(destX, destY);
-    calculatePath();
+      PVector newDest = lab.getEmptyCell(int(x), int(y));
+      destination = newDest;
+      calculatePath();
   }
   
   // Calculer le chemin avec A* vers la destination
