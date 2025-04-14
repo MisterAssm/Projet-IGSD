@@ -1,39 +1,27 @@
 float da = PI / 50.; // angle pour la rotation
 PShape momie;
-PShape handModelR;
-PShape handModelL;
 
 void setup() {
   size(500, 700, P3D);
   frameRate(20);
-
-  handModelR = loadShape("hand1.obj");
-  handModelL = loadShape("hand2.obj");
 
   momie = createShape(GROUP);
   PShape corps = creerCorpsMomie();
   PShape tete = creerTeteMomie();
   PShape yeux = creerYeuxMomie();
   PShape bras = creerBrasMomie();
-  PShape mainL = creerMainMomie(true);
-  PShape mainR = creerMainMomie(false);
+  PShape mains = creerMainsMomie();
 
   momie.addChild(corps);
   momie.addChild(tete);
   momie.addChild(yeux);
   momie.addChild(bras);
-  momie.addChild(mainL);
-  momie.addChild(mainR);
+  momie.addChild(mains);
 }
 
 void draw() {
   background(50);
 
-  float dirY = (mouseY / float(height) - 0.5) * 2;
-  float dirX = (mouseX / float(width) - 0.5) * 2;
-  //directionalLight(204, 204, 204, -dirX, -dirY, -1);
-
-  // Définir les lumières pour toute la scène
   ambientLight(50, 50, 50); // Lumière ambiante
   directionalLight(150, 150, 150, 1, -1, -1); // Lumière directionnelle
 
@@ -44,29 +32,27 @@ void draw() {
   shape(momie);
 }
 
-PShape creerMainMomie(boolean left) {
-  PShape main = createShape(GROUP);
-  
-  if (left) {
-    main.addChild(handModelL);
-  
-    main.rotateX(-0.3);
-    main.rotateZ(-0.8);
-    main.translate(20, -12, 18);
-  } else {
-    main.addChild(handModelR);
+PShape creerMainsMomie() {
+  PShape mains = createShape(GROUP);
+
+  for (int i = -1; i <= 1; i += 2) {
+    PShape main = createShape(GROUP);
     
+    main.addChild(loadShape("hand" + (i == 1 ? "1" : "2") + ".obj"));
     main.rotateX(-0.3);
-    main.rotateZ(0.8);
-    main.translate(-20, -12, 18);
+    main.rotateZ(i * 0.8);
+    main.translate(i * -20, -12, 18);
+
+    main.scale(5);
+    main.setFill(color(141.3, 141.3, 75));
+    main.setStroke(color(50, 40, 30)); // Bordures légèrement plus sombres
+
+    mains.addChild(main);
   }
-  
-  main.scale(5);
-  main.setFill(color(141.3, 141.3, 75));
-  main.setStroke(color(50, 40, 30)); // Bordures légèrement plus sombres
-  
-  return main;
+
+  return mains;
 }
+
 
 // Quadstrip ressemblant plus à des bandages si possible (quadstrip en forme de rectangle)
 PShape creerCorpsMomie() {
