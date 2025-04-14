@@ -27,6 +27,7 @@ Labyrinthe lab;                  // Labyrinthe actuel
 Minimap minimap;                 // Carte du labyrinthe pour navigation
 int etageActuel = 0;             // Niveau actuel du labyrinthe
 int[] taillesEtages = {21, 17, 15, 13, 11};  // Tailles des labyrinthes par étage
+Momie momie;
 
 // === PYRAMIDES ===
 Pyramide pyramidePrincipale;     // Pyramide principale
@@ -68,7 +69,6 @@ boolean inLab = true;            // Vue dans le labyrinthe
 
 void setup() {
   // Configuration de base
-  pixelDensity(2);
   randomSeed(2);
   size(1000, 700, P3D);
   
@@ -99,8 +99,7 @@ void setup() {
   
   // Création de la minimap
   this.minimap = new Minimap(lab);
-  
-  
+  this.momie = new Momie(1, 1);
 }
 
 // ==================== FONCTIONS PRINCIPALES ====================
@@ -208,11 +207,10 @@ void dessinerLabyrinthe() {
   // Dessiner les murs du labyrinthe
   noStroke();
   lab.getAffichage().display(inLab);
+  momie.drawMomie();
   
   // Afficher la minimap en haut à gauche
   minimap.drawMinimap();
-
-
   
   // Vérifier si le joueur a atteint la sortie
   verifierSortieEtage();
@@ -317,8 +315,9 @@ void verifierSortieEtage() {
  */
 void passerEtageSuivant() {
   
-  lab = labyrinthes.get(etageActuel);
-  minimap = new Minimap(lab);
+  this.lab = labyrinthes.get(etageActuel);
+  this.minimap = new Minimap(lab);
+  this.momie = new Momie(1, 1);
 
   
   // Réinitialiser la position et la direction du joueur
