@@ -57,19 +57,10 @@ class ColorWallDecorator {
    * Modifie la couleur d'une face spécifique d'un mur
    */
   private void setWallFaceColor(int x, int y, int face, color c) {
-    // Cette méthode nécessiterait d'accéder aux vertices des murs
-    // Dans votre implémentation actuelle, vous devriez modifier:
-    // - Soit directement dans AffichageLabyrinthe.createWallShape()
-    // - Soit en post-process après la création des shapes
-    
-    // Solution alternative si on ne peut pas modifier les vertices:
-    // On peut surcharger la méthode display() et appliquer un tint()
-    // avant de dessiner les murs
+   
   }
   
-  /**
-   * Version alternative qui utilise tint() pour colorier les murs
-   */
+
   public void displayWithColors() {
     pushStyle();
     
