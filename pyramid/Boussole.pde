@@ -1,6 +1,6 @@
 class Compass {
   private int targetDirection = 0;
-  private int currentDirection = 0;
+  private int currentDirection = 2;
   private float rotationProgress = 0;
   private boolean isRotating = false;
   private float rotationSpeed = 0.1;
@@ -16,7 +16,13 @@ class Compass {
   
   public void drawCompass() {
     pushMatrix();
-    translate(width/2, height/2);
+    camera();
+    ortho();
+    
+    float compassRadius = 200 * scaleFactor;
+    float margin = 20;
+    translate(compassRadius + margin, height - compassRadius - margin); // Positionnement bas-gauche
+    
     rotateX(radians(45));
     
     hint(DISABLE_DEPTH_TEST);
@@ -30,11 +36,9 @@ class Compass {
     updateAnimation();
   }
   
-  public void rotateToNextDirection() {
-    if (!isRotating) {
-      targetDirection = (currentDirection + 1) % 4;
-      isRotating = true;
-    }
+  public void rotateToNextDirection(boolean horaire) {
+    targetDirection = (currentDirection + (horaire ? 1 : -1)) % 4;
+    isRotating = true;
   }
   
   private void createCardinalTexts() {

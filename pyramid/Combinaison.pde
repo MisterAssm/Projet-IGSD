@@ -28,6 +28,7 @@ Minimap minimap;                 // Carte du labyrinthe pour navigation
 int etageActuel = 0;             // Niveau actuel du labyrinthe
 int[] taillesEtages = {21, 17, 15, 13, 11};  // Tailles des labyrinthes par étage
 ArrayList<Momie> momies;
+Compass compass;
 
 // === PYRAMIDES ===
 Pyramide pyramidePrincipale;     // Pyramide principale
@@ -90,8 +91,6 @@ void setup() {
   // Sélection du premier labyrinthe
   lab = labyrinthes.get(0);
   
-
-  
   // Création des pyramides
   pyramidePrincipale = new Pyramide(tailleBase, nbEtages, tailleCellule, hauteurNiveau, texturePierre, textureSommet, texturePorte);
   pyramideSecondaire1 = new Pyramide(21, 9, 40, 60, texturePierre, textureSommet, texturePorte);
@@ -103,6 +102,7 @@ void setup() {
   
   // Création de la minimap
   this.minimap = new Minimap(lab, momies);
+  this.compass = new Compass(0.4);
 }
 
 // ==================== FONCTIONS PRINCIPALES ====================
@@ -217,6 +217,8 @@ void dessinerLabyrinthe() {
   
   // Afficher la minimap en haut à gauche
   minimap.drawMinimap();
+  
+  compass.drawCompass();
   
   // Vérifier si le joueur a atteint la sortie
   verifierSortieEtage();
@@ -453,6 +455,8 @@ void tournerJoueurGauche() {
   dirY = -tmp;
   animT = false;
   animR = true;
+  
+  compass.rotateToNextDirection(false);
 }
 
 void tournerJoueurDroite() {
@@ -464,6 +468,8 @@ void tournerJoueurDroite() {
   int tmp = dirX; 
   dirX = -dirY; 
   dirY = tmp;
+  
+  compass.rotateToNextDirection(true);
 }
 
 
