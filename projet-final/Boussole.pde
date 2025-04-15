@@ -36,9 +36,13 @@ class Compass {
     updateAnimation();
   }
   
-  public void rotateToNextDirection(boolean horaire) {
-    targetDirection = (currentDirection + (horaire ? 1 : -1)) % 4;
+  public void rotateToDirection(int direction) {
+    targetDirection = direction;
     isRotating = true;
+  }
+  
+  public void rotateToNextDirection(boolean horaire) {
+    this.rotateToDirection((currentDirection + (horaire ? 1 : -1)) % 4);
   }
   
   private void createCardinalTexts() {

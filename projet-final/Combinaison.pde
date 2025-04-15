@@ -331,6 +331,7 @@ void passerEtageSuivant() {
   this.momies.add(new Momie(lab.getEmptyCell(1, 1)));
   
   this.minimap = new Minimap(lab, momies);
+  this.compass.rotateToDirection(2);
   
   // Réinitialiser la position et la direction du joueur
   posX = 1; 
